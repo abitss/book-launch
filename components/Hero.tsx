@@ -2,9 +2,7 @@
 
 import Image from "next/image";
 import { Star, Download, ShieldCheck, Smartphone } from "lucide-react";
-import { books } from "@/data/books";
-
-const book = books[0];
+import book from "@/data/books";
 
 export default function Hero() {
   return (

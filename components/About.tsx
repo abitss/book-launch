@@ -1,5 +1,5 @@
 import { CheckCircle } from "lucide-react";
-import book from "@/data/book";
+import book from "@/data/books";
 
 export default function About() {
   return (
