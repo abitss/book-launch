@@ -11,7 +11,7 @@ export const books = [
     rating: 4.9,
     reviews: 2487,
     students: 12483,
-    image: "/cover.jpg",
+    image: "/cover.png",
     pdf: "/books/indian-polity.pdf",
 
     description:
