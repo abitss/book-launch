@@ -1,10 +1,63 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { Star, Download, ShieldCheck, Smartphone } from "lucide-react";
 import book from "@/data/books";
 
 export default function Hero() {
+
+  const [loading, setLoading] = useState(false);
+
+  const handlePayment = async () => {
+    setLoading(true);
+
+    const res = await fetch("/api/create-order", {
+      method: "POST",
+    });
+
+    const order = await res.json();
+
+   const options = {
+  key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+  amount: order.amount,
+  currency: order.currency,
+  name: "ReadRight",
+  description: book.title,
+  order_id: order.id,
+   handler: async function (response: any) {
+    const verify = await fetch("/api/verify-payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(response),
+    });
+
+    const result = await verify.json();
+
+    if (result.success) {
+  alert("✅ Payment Successful!");
+
+  const link = document.createElement("a");
+  link.href = "/book.pdf";
+  link.download = "Laxmikanth.pdf";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+} else {
+  alert("❌ Payment Verification Failed");
+}
+ },
+};
+
+const razorpay = new (window as any).Razorpay(options);
+
+razorpay.open();
+
+    setLoading(false);
+  };
+
   return (
     <section className="bg-gradient-to-b from-green-50 to-white py-16">
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-14 px-6 lg:flex-row">
@@ -96,6 +149,7 @@ export default function Hero() {
           </div>
 
           <button
+            onClick={handlePayment}
             className="
             mt-12
             w-full

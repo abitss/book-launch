@@ -1,45 +1,53 @@
-const book = {
-  title: "Indian Polity",
-  subtitle: "Latest 8th Edition (2025)",
-  author: "M. Laxmikanth",
+export const books = [
+  {
+    id: 1,
 
-  price: 49,
-  originalPrice: 299,
+    slug: "indian-polity",
 
-  rating: 4.9,
-  reviews: 2487,
-  students: 12483,
+    title: "Indian Polity",
 
-  badge: "🔥 Limited Time Offer",
+    subtitle: "Latest 8th Edition (2025)",
 
-  image: "/cover.png",
+    author: "M. Laxmikanth",
 
-  description:
-    "Master Indian Polity with one of the most trusted books for UPSC, State PCS, SSC and other competitive examinations.",
+    badge: "🔥 Limited Time Offer",
 
-  features: [
-    "Instant Digital Download",
-    "Latest 8th Edition (2025)",
-    "High Quality PDF",
-    "Works on Mobile & Laptop",
-    "Lifetime Access",
-    "Printable PDF",
-  ],
+    price: 49,
 
-  topics: [
-    "Constitution",
-    "Preamble",
-    "Fundamental Rights",
-    "Directive Principles",
-    "Fundamental Duties",
-    "Parliament",
-    "President",
-    "Prime Minister",
-    "Supreme Court",
-    "High Courts",
-    "Emergency",
-    "Constitutional Bodies",
-  ],
-};
+    originalPrice: 299,
 
-export default book;
+    rating: 4.9,
+
+    reviews: 2487,
+
+    students: 12483,
+
+    image: "/cover.jpg",
+
+    pdf: "/books/indian-polity.pdf",
+
+    description:
+      "The most trusted book for UPSC Civil Services Preparation. Complete coverage of Constitution, Parliament, Judiciary, Fundamental Rights, DPSP, Local Government and Constitutional Bodies.",
+
+    features: [
+      "Instant PDF Download",
+      "Works on Mobile & Laptop",
+      "Lifetime Access",
+      "Latest Edition",
+      "High Quality PDF"
+    ],
+
+    topics: [
+      "Preamble",
+      "Fundamental Rights",
+      "Fundamental Duties",
+      "DPSP",
+      "President",
+      "Prime Minister",
+      "Parliament",
+      "Supreme Court",
+      "Governor",
+      "Election Commission"
+    ]
+  }
+];
