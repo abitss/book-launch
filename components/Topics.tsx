@@ -1,6 +1,8 @@
 import { BookOpen } from "lucide-react";
 import book from "@/data/books";
 
+const bookData = book[0];
+
 export default function Topics() {
   return (
     <section className="bg-white py-20">
@@ -25,7 +27,7 @@ export default function Topics() {
 
         <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
 
-          {book.topics.map((topic) => (
+          {bookData.topics.map((topic) => (
 
             <div
               key={topic}

@@ -1,29 +1,17 @@
 export const books = [
   {
     id: 1,
-
     slug: "indian-polity",
-
     title: "Indian Polity",
-
     subtitle: "Latest 8th Edition (2025)",
-
     author: "M. Laxmikanth",
-
     badge: "🔥 Limited Time Offer",
-
     price: 49,
-
     originalPrice: 299,
-
     rating: 4.9,
-
     reviews: 2487,
-
     students: 12483,
-
     image: "/cover.jpg",
-
     pdf: "/books/indian-polity.pdf",
 
     description:
@@ -51,3 +39,5 @@ export const books = [
     ]
   }
 ];
+
+export default books;

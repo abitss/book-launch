@@ -1,6 +1,8 @@
 import { CheckCircle } from "lucide-react";
 import book from "@/data/books";
 
+const bookData = book[0];
+
 export default function About() {
   return (
     <section className="bg-slate-50 py-20">
@@ -17,14 +19,14 @@ export default function About() {
           </h2>
 
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-gray-600">
-            {book.description}
+            {bookData.description}
           </p>
 
         </div>
 
         <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 
-          {book.features.map((feature) => (
+          {bookData.features.map((feature) => (
             <div
               key={feature}
               className="
