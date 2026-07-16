@@ -12,7 +12,7 @@ export const books = [
     reviews: 2487,
     students: 12483,
     image: "/cover.png",
-    pdf: "/books/indian-polity.pdf",
+    pdf: "/llp/indian-polity.pdf",
 
     description:
       "The most trusted book for UPSC Civil Services Preparation. Complete coverage of Constitution, Parliament, Judiciary, Fundamental Rights, DPSP, Local Government and Constitutional Bodies.",
