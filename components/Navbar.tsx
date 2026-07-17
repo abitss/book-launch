@@ -1,6 +1,7 @@
 "use client";
 
 import { BookOpen } from "lucide-react";
+import { startPayment } from "@/lib/payment";
 
 export default function Navbar() {
   return (
@@ -26,18 +27,19 @@ export default function Navbar() {
         </div>
 
         <button
-          className="
-          rounded-xl
-          bg-green-600
-          px-5
-          py-2
-          font-semibold
-          text-white
-          hover:bg-green-700
-          "
-        >
-          Buy ₹49
-        </button>
+  onClick={startPayment}
+  className="
+  rounded-xl
+  bg-green-600
+  px-5
+  py-2
+  font-semibold
+  text-white
+  hover:bg-green-700
+  "
+>
+  Buy ₹49
+</button>
 
       </div>
     </header>

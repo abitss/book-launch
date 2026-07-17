@@ -1,6 +1,7 @@
 "use client";
 
 import { ShoppingCart } from "lucide-react";
+import { startPayment } from "@/lib/payment";
 
 export default function StickyBuyBar() {
   return (
@@ -13,7 +14,6 @@ export default function StickyBuyBar() {
           </p>
 
           <div className="flex items-center gap-3">
-
             <span className="text-3xl font-black text-green-600">
               ₹49
             </span>
@@ -21,12 +21,11 @@ export default function StickyBuyBar() {
             <span className="text-lg text-gray-400 line-through">
               ₹299
             </span>
-
           </div>
-
         </div>
 
         <button
+          onClick={startPayment}
           className="
           flex
           items-center
@@ -43,7 +42,6 @@ export default function StickyBuyBar() {
           "
         >
           <ShoppingCart className="h-5 w-5" />
-
           Buy Now
         </button>
 
