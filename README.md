@@ -1,4 +1,4 @@
-# eBookies.store
+# eBookiee.store
 
 A digital bookstore built with Next.js 16 and Razorpay, with optional Supabase support for private ebook delivery and order records.
 
@@ -41,7 +41,7 @@ This keeps the public site smaller and removes the need for an exposed admin/log
 Add these in `.env.local` for local development and in Vercel Project Settings → Environment Variables for production:
 
 ```env
-NEXT_PUBLIC_SITE_URL=https://ebookies.store
+NEXT_PUBLIC_SITE_URL=https://ebookiee.store
 
 RAZORPAY_KEY_ID=rzp_live_or_test_key
 NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_or_test_key
