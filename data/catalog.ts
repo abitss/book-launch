@@ -34,14 +34,17 @@ export type Book = {
   active?: boolean;
 };
 
-export const fallbackCategories: Category[] = [
+// OFFICIAL EBOOKIES CATALOG
+// Send new book details to be added here. The storefront reads directly from these arrays.
+
+export const categories: Category[] = [
   { id: "exam-prep", name: "Exam Prep", slug: "exam-prep", description: "Competitive exams, government exams and entrance preparation." },
   { id: "business", name: "Business & Money", slug: "business", description: "Business, finance, startups and career growth." },
   { id: "fiction", name: "Fiction", slug: "fiction", description: "Stories, novels and immersive reads." },
   { id: "self-growth", name: "Self Growth", slug: "self-growth", description: "Habits, psychology, productivity and personal development." }
 ];
 
-export const fallbackSubcategories: Subcategory[] = [
+export const subcategories: Subcategory[] = [
   { id: "upsc", category_id: "exam-prep", name: "UPSC", slug: "upsc" },
   { id: "ssc", category_id: "exam-prep", name: "SSC", slug: "ssc" },
   { id: "startup", category_id: "business", name: "Startups", slug: "startups" },
@@ -49,7 +52,7 @@ export const fallbackSubcategories: Subcategory[] = [
   { id: "productivity", category_id: "self-growth", name: "Productivity", slug: "productivity" }
 ];
 
-export const fallbackBooks: Book[] = [
+export const books: Book[] = [
   {
     id: "indian-polity",
     slug: "indian-polity",
@@ -60,10 +63,12 @@ export const fallbackBooks: Book[] = [
     price: 49,
     original_price: 299,
     cover_url: "/cover.png",
+    file_path: null,
     category_slug: "exam-prep",
     subcategory_slug: "upsc",
     badge: "Popular",
     language: "English",
+    pages: null,
     format: "PDF",
     featured: true,
     active: true
