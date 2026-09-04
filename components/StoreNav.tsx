@@ -11,7 +11,7 @@ export default function StoreNav() {
 
       <header className="sticky top-0 z-50 border-b border-[#E7EAF0] bg-[#FFFCF7]/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center gap-5 px-4 py-3 sm:px-6">
-          <Link href="/" className="shrink-0" aria-label="eBookies.store home">
+          <Link href="/" className="shrink-0" aria-label="eBookiee.store home">
             <BrandLogo showTagline />
           </Link>
 
