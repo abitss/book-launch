@@ -24,7 +24,7 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
-        name: "eBookies.store",
+        name: "eBookiee.store",
         description: title,
         order_id: order.id,
         theme: { color: "#0B2D5B" },
@@ -37,7 +37,7 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
           const verified = await verifyResponse.json();
           if (!verifyResponse.ok || !verified.success) throw new Error(verified.message || "Payment verification failed");
           if (verified.downloadUrl) window.location.href = verified.downloadUrl;
-          else alert("Payment verified. Your order has been recorded. The download will be enabled once the ebook file is attached in Admin.");
+          else alert("Payment verified. Your order has been recorded. If your download is not available yet, please contact eBookiee.store support with your payment ID.");
         }
       });
       razorpay.open();
