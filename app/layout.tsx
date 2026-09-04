@@ -8,9 +8,15 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://ebookies.store"),
-  title: { default: "eBookies.store | Digital Bookstore", template: "%s | eBookies.store" },
-  description: "Discover and buy ebooks across exam prep, business, fiction and self-growth with secure digital delivery.",
-  openGraph: { title: "eBookies.store", description: "Read. Own. Repeat.", type: "website" }
+  title: { default: "eBookies.store | Good books. Brighter you.", template: "%s | eBookies.store" },
+  description: "Discover digital books across exam prep, business, fiction and self-growth with secure Razorpay checkout and verified digital delivery.",
+  openGraph: {
+    title: "eBookies.store",
+    description: "Good books. Brighter you. Discover digital reads with secure checkout and simple delivery.",
+    type: "website",
+    siteName: "eBookies.store"
+  },
+  robots: { index: true, follow: true }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
