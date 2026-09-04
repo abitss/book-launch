@@ -1,28 +1,44 @@
 # eBookies.store
 
-A full digital bookstore built with Next.js 16, Razorpay and Supabase.
+A digital bookstore built with Next.js 16 and Razorpay, with optional Supabase support for private ebook delivery and order records.
 
-## What changed
+## Catalog workflow
 
-The original single-book landing page has been upgraded into a multi-category bookstore with:
+The bookstore catalog is intentionally maintained in code instead of through an admin dashboard.
 
-- eBookies.store branding and responsive storefront
-- Category and subcategory browsing
-- Search by title, author and category
-- Dedicated book pages
-- Product-aware Razorpay orders (price is resolved server-side)
-- Razorpay signature verification before fulfillment
-- Private ebook delivery through short-lived Supabase Storage signed URLs
-- Owner-only admin command center
-- Add/edit/delete books
-- Publish/unpublish and feature books
-- Add/delete categories and subcategories
-- Upload cover images and ebook files
-- Order persistence in Supabase
+The source of truth is:
 
-## Required environment variables
+```text
+data/catalog.ts
+```
 
-Create these in `.env.local` for local development and in Vercel Project Settings → Environment Variables for production.
+Each book can define:
+
+- title
+- slug
+- author
+- subtitle
+- description
+- selling price
+- original price
+- cover URL/path
+- private ebook file path
+- category
+- subcategory
+- badge
+- language
+- page count
+- format
+- featured status
+- active/published status
+
+Categories and subcategories are maintained in the same file.
+
+This keeps the public site smaller and removes the need for an exposed admin/login/upload system.
+
+## Required Razorpay variables
+
+Add these in `.env.local` for local development and in Vercel Project Settings → Environment Variables for production:
 
 ```env
 NEXT_PUBLIC_SITE_URL=https://ebookies.store
@@ -30,41 +46,71 @@ NEXT_PUBLIC_SITE_URL=https://ebookies.store
 RAZORPAY_KEY_ID=rzp_live_or_test_key
 NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_or_test_key
 RAZORPAY_KEY_SECRET=your_razorpay_secret
-
-SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-ADMIN_PASSWORD=choose-a-strong-owner-password
-ADMIN_SESSION_SECRET=generate-a-long-random-secret
 ```
 
 Never commit real secrets to GitHub.
 
-## Database setup
+## Optional Supabase variables
 
-1. Create a Supabase project.
-2. Open Supabase SQL Editor.
-3. Run `supabase/schema.sql`.
-4. Add the Supabase environment variables above.
-5. Redeploy.
+Supabase is no longer used as the public catalog database. It is optional and only needed if you want server-side order persistence and private ebook delivery through signed links.
 
-The schema creates `categories`, `subcategories`, `books` and `orders`, plus a public `covers` bucket and private `ebooks` bucket.
+```env
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
 
-## Admin
+If using Supabase, run:
 
-Visit `/admin`.
+```text
+supabase/schema.sql
+```
 
-The owner login uses `ADMIN_PASSWORD` and stores only a signed HTTP-only session cookie. Catalog mutations and uploads are rejected server-side unless the owner session is valid.
+The minimal schema creates an `orders` table and a private `ebooks` storage bucket.
 
-## Razorpay
+## Razorpay flow
 
-The browser sends only a book ID. `/api/create-order` looks up the live book record and uses its server-side price to create the Razorpay order. `/api/verify-payment` verifies the Razorpay signature before marking the order paid or issuing a private download link.
+The browser sends only the book ID.
 
-For test mode, use Razorpay test keys first. Replace them with live keys only after testing checkout end-to-end.
+`/api/create-order` resolves the book and price from `data/catalog.ts` on the server, then creates the Razorpay order.
+
+`/api/verify-payment` verifies the Razorpay signature before fulfillment. If the book has a `file_path` and Supabase private storage is configured, a short-lived signed download link is returned after successful payment.
+
+## Adding a new book
+
+Add the title to `data/catalog.ts` and add its cover file under `public/` (or use a trusted hosted cover URL).
+
+For protected paid files, upload the ebook to the private Supabase `ebooks` bucket and set the matching `file_path` in the book record.
+
+Example:
+
+```ts
+{
+  id: "example-book",
+  slug: "example-book",
+  title: "Example Book",
+  subtitle: "A clear one-line value proposition",
+  author: "Author Name",
+  description: "Customer-facing description of the book.",
+  price: 99,
+  original_price: 299,
+  cover_url: "/books/example-book.jpg",
+  file_path: "example-book.pdf",
+  category_slug: "self-growth",
+  subcategory_slug: "productivity",
+  badge: "Bestseller",
+  language: "English",
+  pages: 240,
+  format: "PDF",
+  featured: true,
+  active: true
+}
+```
 
 ## Digital rights
 
-Only upload and sell ebooks, notes or publications you own or have explicit permission/license to distribute. Do not put paid ebook files in `/public`; the new fulfillment path uses the private Supabase `ebooks` bucket.
+Only list and sell ebooks, notes or publications that you own or have explicit permission/license to distribute.
+
+Do not place protected paid ebook files inside `/public` because everything in that directory is directly accessible by URL.
 
 ## Development
 
