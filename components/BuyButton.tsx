@@ -27,7 +27,7 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
         name: "eBookies.store",
         description: title,
         order_id: order.id,
-        theme: { color: "#171717" },
+        theme: { color: "#0B2D5B" },
         handler: async (payment: Record<string, string>) => {
           const verifyResponse = await fetch("/api/verify-payment", {
             method: "POST",
@@ -49,9 +49,11 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
   }
 
   return (
-    <button onClick={buy} disabled={loading} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#171717] px-6 py-4 text-base font-black text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-black disabled:opacity-60">
-      {loading ? <Loader2 className="animate-spin" size={19} /> : <BookOpenCheck size={19} />} Buy now for ₹{price}
-      <LockKeyhole size={14} className="ml-1 opacity-60" />
-    </button>
+    <div>
+      <button onClick={buy} disabled={loading} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#F59E0B] px-6 py-4 text-base font-semibold text-[#0B2D5B] shadow-[0_12px_30px_rgba(245,158,11,.24)] transition hover:-translate-y-0.5 hover:bg-[#FDBA4A] disabled:cursor-not-allowed disabled:opacity-60">
+        {loading ? <Loader2 className="animate-spin" size={19} /> : <BookOpenCheck size={19} />} Get instant access · ₹{price}
+      </button>
+      <div className="mt-2.5 flex items-center justify-center gap-1.5 text-xs font-medium text-[#7C8CA1]"><LockKeyhole size={13} /> Secure checkout powered by Razorpay</div>
+    </div>
   );
 }
