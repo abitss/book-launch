@@ -23,7 +23,7 @@ export default function StoreFooter() {
 
         <div><h4 className="font-semibold text-white">Shop with confidence</h4><div className="mt-4 grid gap-2.5 text-sm text-white/58"><span>Verified payment flow</span><span>Clear digital format details</span><span>Transparent pricing</span><span>Private delivery architecture</span></div></div>
       </div>
-      <div className="border-t border-white/10 px-6 py-5 text-center text-xs text-white/42">© {new Date().getFullYear()} eBookies.store. All rights reserved.</div>
+      <div className="border-t border-white/10 px-6 py-5 text-center text-xs text-white/42">© {new Date().getFullYear()} eBookiee.store. All rights reserved.</div>
     </footer>
   );
 }
