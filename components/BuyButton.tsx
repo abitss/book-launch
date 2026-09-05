@@ -49,17 +49,17 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
   }
 
   return (
-    <div className="rounded-[22px] border border-[#E3E8EF] bg-white p-3 shadow-[0_14px_40px_rgba(11,45,91,.08)] sm:rounded-[24px] sm:p-4">
-      <div className="mb-3 flex items-center justify-between gap-3 rounded-2xl bg-[#F8FAFC] px-3.5 py-3 text-xs">
-        <span className="inline-flex items-center gap-1.5 font-semibold text-[#0B2D5B]"><ShieldCheck size={15} className="text-[#16815A]" /> Protected payment</span>
+    <div className="rounded-[20px] border border-[#E1E7EE] bg-white p-3 shadow-[0_12px_32px_rgba(11,45,91,.07)] sm:p-4">
+      <div className="mb-3 flex items-center justify-between gap-3 rounded-xl bg-[#F8FAFC] px-3.5 py-2.5 text-xs">
+        <span className="inline-flex items-center gap-1.5 font-semibold text-[#0B2D5B]"><ShieldCheck size={15} className="text-[#16815A]" /> Secure payment</span>
         <span className="font-bold text-[#0B2D5B]">₹{price}</span>
       </div>
-      <button onClick={buy} disabled={loading} className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#F59E0B] px-5 py-4 text-[15px] font-bold text-[#0B2D5B] shadow-[0_12px_30px_rgba(245,158,11,.24)] transition hover:-translate-y-0.5 hover:bg-[#FDBA4A] disabled:cursor-not-allowed disabled:opacity-60 sm:text-base">
+      <button onClick={buy} disabled={loading} className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#F59E0B] px-5 py-4 text-[15px] font-bold text-[#0B2D5B] shadow-[0_10px_26px_rgba(245,158,11,.22)] transition hover:-translate-y-0.5 hover:bg-[#FDBA4A] disabled:cursor-not-allowed disabled:opacity-60 sm:text-base">
         {loading ? <Loader2 className="animate-spin" size={19} /> : <BookOpenCheck size={19} />} Buy now · ₹{price}
       </button>
       <div className="mt-3 grid gap-1.5 text-[11px] font-medium text-[#708095] min-[430px]:grid-cols-2 sm:text-xs">
-        <span className="flex items-center gap-1.5"><LockKeyhole size={13} className="shrink-0 text-[#16815A]" /> Secure encrypted checkout</span>
-        <span className="flex items-center gap-1.5"><CheckCircle2 size={13} className="shrink-0 text-[#16815A]" /> Server-verified payment</span>
+        <span className="flex items-center gap-1.5"><LockKeyhole size={13} className="shrink-0 text-[#16815A]" /> Encrypted checkout</span>
+        <span className="flex items-center gap-1.5"><CheckCircle2 size={13} className="shrink-0 text-[#16815A]" /> Payment verified before access</span>
       </div>
     </div>
   );
