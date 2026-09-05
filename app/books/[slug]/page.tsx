@@ -18,17 +18,17 @@ export default async function BookPage({ params }: { params: Promise<{ slug: str
   const savings = book.original_price && book.original_price > book.price ? book.original_price - book.price : null;
 
   return (
-    <main className="min-h-screen bg-[#FAFAF8] pb-20 text-[#1F2937] md:pb-0">
+    <main className="min-h-screen bg-[#FAFAF8] pb-36 text-[#1F2937] md:pb-0">
       <StoreNav />
 
       <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 sm:pt-7">
         <Link href={`/category/${book.category_slug}`} className="inline-flex items-center gap-2 text-xs font-semibold text-[#7C8CA1] transition hover:text-[#0B2D5B]"><ArrowLeft size={14} /> Back to {book.category_slug.replaceAll("-", " ")}</Link>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-4 sm:px-6 sm:py-8 lg:grid-cols-[.84fr_1.16fr] lg:gap-10 lg:py-12">
-        <div className="self-start rounded-[22px] border border-[#E1E7EE] bg-white p-4 shadow-[0_16px_42px_rgba(11,45,91,.06)] sm:rounded-[30px] sm:p-7 lg:sticky lg:top-24">
+      <section className="mx-auto grid max-w-7xl gap-5 px-4 py-4 sm:px-6 sm:py-8 lg:grid-cols-[.84fr_1.16fr] lg:gap-10 lg:py-12">
+        <div className="self-start rounded-[20px] border border-[#E1E7EE] bg-white p-3.5 shadow-[0_14px_36px_rgba(11,45,91,.055)] sm:rounded-[28px] sm:p-7 lg:sticky lg:top-24">
           <div className="rounded-2xl bg-[linear-gradient(145deg,#F3F6FA_0%,#FBFAF7_55%,#FFF1D3_100%)] p-3 sm:p-5">
-            <img src={book.cover_url} alt={book.title} className="mx-auto max-h-[420px] w-full rounded-xl object-contain drop-shadow-[0_20px_24px_rgba(11,45,91,.17)] sm:max-h-[610px]" />
+            <img src={book.cover_url} alt={book.title} className="mx-auto max-h-[390px] w-full rounded-xl object-contain drop-shadow-[0_20px_24px_rgba(11,45,91,.16)] sm:max-h-[610px]" />
           </div>
         </div>
 
@@ -48,33 +48,32 @@ export default async function BookPage({ params }: { params: Promise<{ slug: str
             {book.original_price ? <span className="pb-1 text-sm text-[#94A3B8] line-through sm:text-lg">₹{book.original_price}</span> : null}
             {savings ? <span className="pb-1 text-xs font-bold text-[#16815A] sm:text-sm">Save ₹{savings}</span> : null}
           </div>
-          <p className="mt-1.5 text-xs font-medium leading-5 text-[#64748B] sm:text-sm">Digital edition · Secure payment · Access after successful payment</p>
+
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-semibold text-[#5F7084] sm:text-xs">
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} className="text-[#16815A]" /> Secure payment</span>
+            <span className="inline-flex items-center gap-1.5"><Download size={14} className="text-[#F59E0B]" /> Digital access after verification</span>
+            <span className="inline-flex items-center gap-1.5"><Smartphone size={14} className="text-[#F59E0B]" /> Works across devices</span>
+          </div>
 
           <div className="mt-5 w-full sm:max-w-md"><BuyButton bookId={book.id} title={book.title} price={book.price} /></div>
-
-          <div className="mt-4 grid grid-cols-3 gap-2 sm:mt-6 sm:gap-3">
-            <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-[#E4E9F0] bg-white p-3 text-center text-[10px] font-semibold text-[#475569] sm:flex-row sm:text-left sm:text-sm"><Download size={16} className="shrink-0 text-[#F59E0B]" /> Digital access</div>
-            <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-[#DDEBE4] bg-[#FBFEFC] p-3 text-center text-[10px] font-semibold text-[#475569] sm:flex-row sm:text-left sm:text-sm"><ShieldCheck size={16} className="shrink-0 text-[#16815A]" /> Secure payment</div>
-            <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-[#E4E9F0] bg-white p-3 text-center text-[10px] font-semibold text-[#475569] sm:flex-row sm:text-left sm:text-sm"><Smartphone size={16} className="shrink-0 text-[#F59E0B]" /> Device friendly</div>
-          </div>
 
           <div className="mt-6 border-t border-[#E4E9F0] pt-6 sm:mt-8 sm:pt-8">
             <h2 className="text-xl font-semibold text-[#0B2D5B] sm:text-2xl">About this ebook</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F6F82] sm:text-base sm:leading-8">{book.description}</p>
           </div>
 
-          <div className="mt-6 grid grid-cols-3 gap-3 rounded-3xl border border-[#E4E9F0] bg-white p-4 shadow-[0_12px_34px_rgba(11,45,91,.045)] sm:mt-8 sm:p-5">
+          <div className="mt-6 grid grid-cols-3 gap-2.5 rounded-2xl border border-[#E4E9F0] bg-white p-3.5 shadow-[0_10px_28px_rgba(11,45,91,.04)] sm:mt-8 sm:gap-3 sm:rounded-3xl sm:p-5">
             <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:text-left"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#FFF3D7] text-[#A86106]"><FileText size={16} /></span><div><p className="text-[9px] font-bold uppercase tracking-wide text-[#94A3B8] sm:text-xs">Format</p><p className="text-xs font-semibold text-[#0B2D5B] sm:text-base">{book.format || "eBook"}</p></div></div>
             <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:text-left"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#FFF3D7] text-[#A86106]"><Languages size={16} /></span><div><p className="text-[9px] font-bold uppercase tracking-wide text-[#94A3B8] sm:text-xs">Language</p><p className="text-xs font-semibold text-[#0B2D5B] sm:text-base">{book.language || "Digital"}</p></div></div>
             <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:text-left"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#FFF3D7] text-[#A86106]"><FileText size={16} /></span><div><p className="text-[9px] font-bold uppercase tracking-wide text-[#94A3B8] sm:text-xs">Length</p><p className="text-xs font-semibold text-[#0B2D5B] sm:text-base">{book.pages ? `${book.pages} pages` : "See edition"}</p></div></div>
           </div>
 
-          <div className="mt-6 rounded-3xl bg-[#0B2D5B] p-5 text-white shadow-[0_18px_50px_rgba(11,45,91,.16)] sm:mt-8 sm:p-6">
-            <h3 className="text-lg font-semibold">What happens after purchase?</h3>
+          <div className="mt-6 rounded-2xl bg-[#0B2D5B] p-5 text-white shadow-[0_16px_44px_rgba(11,45,91,.14)] sm:mt-8 sm:rounded-3xl sm:p-6">
+            <h3 className="text-lg font-semibold">How your purchase works</h3>
             <div className="mt-4 grid gap-3 text-sm leading-6 text-white/72">
-              <span className="flex items-start gap-2"><CheckCircle2 size={17} className="mt-0.5 shrink-0 text-[#FDBA4A]" /> Your payment is securely verified before fulfillment.</span>
-              <span className="flex items-start gap-2"><CheckCircle2 size={17} className="mt-0.5 shrink-0 text-[#FDBA4A]" /> When an ebook file is attached, access is provided through a private download link.</span>
-              <span className="flex items-start gap-2"><CheckCircle2 size={17} className="mt-0.5 shrink-0 text-[#FDBA4A]" /> You can read the downloaded edition on compatible phones, tablets and laptops.</span>
+              <span className="flex items-start gap-2"><CheckCircle2 size={17} className="mt-0.5 shrink-0 text-[#FDBA4A]" /> Review the book details and final amount before paying.</span>
+              <span className="flex items-start gap-2"><CheckCircle2 size={17} className="mt-0.5 shrink-0 text-[#FDBA4A]" /> Complete secure payment. The transaction is verified before fulfillment.</span>
+              <span className="flex items-start gap-2"><CheckCircle2 size={17} className="mt-0.5 shrink-0 text-[#FDBA4A]" /> When the digital file is attached, access is provided through a private download link.</span>
             </div>
           </div>
         </div>
