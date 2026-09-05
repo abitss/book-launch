@@ -10,7 +10,7 @@ export default function StoreFooter() {
           <BrandLogo showTagline inverse />
           <p className="mt-4 max-w-md text-sm leading-7 text-white/60 sm:mt-5">A calm, trustworthy digital bookstore built around simple discovery, secure checkout and fast access to your next read.</p>
           <div className="mt-5 grid max-w-md gap-3 text-xs font-medium min-[460px]:grid-cols-2 sm:mt-6">
-            <span className="flex items-center gap-2"><ShieldCheck size={15} className="shrink-0 text-[#FDBA4A]" /> Secure Razorpay checkout</span>
+            <span className="flex items-center gap-2"><ShieldCheck size={15} className="shrink-0 text-[#FDBA4A]" /> Secure verified checkout</span>
             <span className="flex items-center gap-2"><Download size={15} className="shrink-0 text-[#FDBA4A]" /> Digital delivery</span>
             <span className="flex items-center gap-2"><Smartphone size={15} className="shrink-0 text-[#FDBA4A]" /> Read across devices</span>
             <span className="flex items-center gap-2"><Mail size={15} className="shrink-0 text-[#FDBA4A]" /> Support when needed</span>
@@ -21,7 +21,7 @@ export default function StoreFooter() {
 
         <div><h4 className="font-semibold text-white">Support</h4><div className="mt-3 grid gap-2.5 text-sm sm:mt-4"><Link href="/contact" className="transition hover:text-[#FDBA4A]">Contact us</Link><Link href="/refund-policy" className="transition hover:text-[#FDBA4A]">Refund policy</Link><Link href="/privacy-policy" className="transition hover:text-[#FDBA4A]">Privacy policy</Link><Link href="/terms-and-conditions" className="transition hover:text-[#FDBA4A]">Terms & conditions</Link></div></div>
 
-        <div><h4 className="font-semibold text-white">Shop with confidence</h4><div className="mt-3 grid gap-2.5 text-sm leading-6 text-white/58 sm:mt-4"><span>Verified payment flow</span><span>Clear digital format details</span><span>Transparent pricing</span><span>Private delivery architecture</span></div></div>
+        <div><h4 className="font-semibold text-white">Shop with confidence</h4><div className="mt-3 grid gap-2.5 text-sm leading-6 text-white/58 sm:mt-4"><span>Server-verified payment</span><span>Clear digital format details</span><span>Transparent pricing</span><span>Private delivery architecture</span></div></div>
       </div>
       <div className="border-t border-white/10 px-4 py-5 text-center text-[11px] leading-5 text-white/42 sm:px-6 sm:text-xs">© {new Date().getFullYear()} eBookiee.store. All rights reserved.</div>
     </footer>
