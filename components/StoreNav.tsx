@@ -5,11 +5,11 @@ import BrandLogo from "@/components/BrandLogo";
 export default function StoreNav() {
   return (
     <>
-      <div className="bg-[#0B2D5B] px-3 py-2 text-center text-[10px] font-medium leading-4 tracking-[.035em] text-white/90 sm:px-4 sm:text-xs sm:tracking-[.06em]">
-        <span className="inline-flex items-center justify-center gap-1.5"><ShieldCheck size={12} className="shrink-0 text-[#FDBA4A] sm:size-[13px]" /> Secure checkout · Digital access after verified payment</span>
+      <div className="bg-[#0B2D5B] px-3 py-2 text-center text-[10px] font-semibold leading-4 tracking-[.02em] text-white/92 sm:px-4 sm:text-xs sm:tracking-[.05em]">
+        <span className="inline-flex items-center justify-center gap-1.5"><ShieldCheck size={12} className="shrink-0 text-[#FDBA4A] sm:size-[13px]" /> Secure payment · Verified digital delivery</span>
       </div>
 
-      <header className="sticky top-0 z-50 border-b border-[#E7EAF0] bg-[#FFFCF7]/95 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-[#E7EAF0] bg-[#FFFCF7]/96 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center gap-2.5 px-3 py-2.5 min-[380px]:gap-3 sm:px-6 sm:py-3">
           <Link href="/" className="min-w-0 shrink" aria-label="eBookiee.store home">
             <BrandLogo showTagline />
@@ -29,14 +29,14 @@ export default function StoreNav() {
             </label>
           </form>
 
-          <Link href="/search" className="ml-auto shrink-0 rounded-xl bg-[#F59E0B] px-3 py-2 text-xs font-semibold text-[#0B2D5B] shadow-sm transition hover:bg-[#FDBA4A] min-[380px]:px-4 min-[380px]:py-2.5 min-[380px]:text-sm md:hidden">Browse</Link>
+          <Link href="/search" className="ml-auto shrink-0 rounded-xl bg-[#F59E0B] px-3 py-2 text-xs font-bold text-[#0B2D5B] shadow-sm transition hover:bg-[#FDBA4A] min-[380px]:px-4 min-[380px]:py-2.5 min-[380px]:text-sm md:hidden">Browse</Link>
         </div>
 
-        <div className="border-t border-[#EEF1F5] px-3 py-2.5 sm:px-4 md:hidden">
+        <div className="border-t border-[#EEF1F5] px-3 pb-2.5 pt-2 sm:px-4 md:hidden">
           <form action="/search" className="mx-auto max-w-7xl">
-            <label className="flex items-center gap-2 rounded-xl border border-[#DDE3EC] bg-white px-3 shadow-sm">
+            <label className="flex items-center gap-2 rounded-2xl border border-[#DDE3EC] bg-white px-3.5 shadow-[0_5px_18px_rgba(11,45,91,.05)]">
               <Search size={16} className="shrink-0 text-[#7C8CA1]" />
-              <input name="q" className="w-full bg-transparent py-2.5 text-base text-[#1F2937] outline-none placeholder:text-[#94A3B8]" placeholder="Search ebooks..." aria-label="Search ebooks" />
+              <input name="q" className="w-full bg-transparent py-2.5 text-base text-[#1F2937] outline-none placeholder:text-[#94A3B8]" placeholder="Search title or author" aria-label="Search ebooks" />
             </label>
           </form>
         </div>
