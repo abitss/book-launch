@@ -5,7 +5,12 @@ import { bookOverrides } from "@/data/catalog-overrides";
 const supabaseUrl = process.env.SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const withOverrides = (book: Book): Book => ({ ...book, ...(bookOverrides[book.id] || {}) });
+const withOverrides = (book: Book): Book => ({
+  ...book,
+  ...(bookOverrides[book.id] || {}),
+  purchasable: true
+});
+
 const allBooks = [...books, ...extraBooks].map(withOverrides);
 const allCategories = [...categories, ...extraCategories];
 const allSubcategories = [...subcategories, ...extraSubcategories];
