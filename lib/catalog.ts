@@ -1,7 +1,12 @@
 import { Book, Category, Subcategory, books, categories, subcategories } from "@/data/catalog";
+import { extraBooks, extraCategories, extraSubcategories } from "@/data/catalog-extra";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const allBooks = [...books, ...extraBooks];
+const allCategories = [...categories, ...extraCategories];
+const allSubcategories = [...subcategories, ...extraSubcategories];
 
 function hasSupabase() {
   return Boolean(supabaseUrl && serviceKey);
@@ -26,27 +31,27 @@ async function dbFetch<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export async function getBooks(): Promise<Book[]> {
-  return books.filter((book) => book.active !== false);
+  return allBooks.filter((book) => book.active !== false);
 }
 
 export async function getBookBySlug(slug: string): Promise<Book | null> {
-  return books.find((book) => book.slug === slug && book.active !== false) || null;
+  return allBooks.find((book) => book.slug === slug && book.active !== false) || null;
 }
 
 export async function getBookById(id: string): Promise<Book | null> {
-  return books.find((book) => book.id === id && book.active !== false) || null;
+  return allBooks.find((book) => book.id === id && book.active !== false) || null;
 }
 
 export async function getCategories(): Promise<Category[]> {
-  return categories;
+  return allCategories;
 }
 
 export async function getSubcategories(): Promise<Subcategory[]> {
-  return subcategories;
+  return allSubcategories;
 }
 
 export async function getBooksByCategory(slug: string): Promise<Book[]> {
-  return books.filter((book) => book.active !== false && book.category_slug === slug);
+  return allBooks.filter((book) => book.active !== false && book.category_slug === slug);
 }
 
 export async function createOrderRecord(value: Record<string, unknown>) {
