@@ -34,8 +34,8 @@ export type Book = {
   active?: boolean;
 };
 
-// OFFICIAL EBOOKIES CATALOG
-// Send new book details to be added here. The storefront reads directly from these arrays.
+// OFFICIAL EBOOKIEE.STORE CATALOG
+// New titles are curated here with verified metadata and a fixed ₹50 selling price unless explicitly changed.
 
 export const categories: Category[] = [
   { id: "exam-prep", name: "Exam Prep", slug: "exam-prep", description: "Competitive exams, government exams and entrance preparation." },
@@ -60,8 +60,8 @@ export const books: Book[] = [
     subtitle: "A focused digital edition for exam preparation",
     author: "M. Laxmikanth",
     description: "A structured Indian polity title covering core constitutional and governance topics for competitive-exam preparation. Only list and sell editions you have the legal right to distribute.",
-    price: 49,
-    original_price: 299,
+    price: 50,
+    original_price: null,
     cover_url: "/cover.png",
     file_path: null,
     category_slug: "exam-prep",
