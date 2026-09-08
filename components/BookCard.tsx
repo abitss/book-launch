@@ -4,6 +4,7 @@ import { ArrowRight, BadgeCheck, Download } from "lucide-react";
 
 export default function BookCard({ book }: { book: Book }) {
   const discount = book.original_price && book.original_price > book.price ? Math.round((1 - book.price / book.original_price) * 100) : null;
+  const coverSrc = `/api/book-cover/${book.id}`;
 
   return (
     <article className="group h-full overflow-hidden rounded-[18px] border border-[#E1E7EE] bg-white shadow-[0_8px_24px_rgba(11,45,91,.055)] transition duration-300 hover:-translate-y-1 hover:border-[#C8D4E2] hover:shadow-[0_18px_42px_rgba(11,45,91,.10)]">
@@ -13,7 +14,7 @@ export default function BookCard({ book }: { book: Book }) {
             {book.badge ? <span className="rounded-full bg-[#0B2D5B] px-2 py-1 text-[8px] font-bold uppercase tracking-[.08em] text-white sm:text-[9px]">{book.badge}</span> : null}
             {discount ? <span className="rounded-full bg-[#FDBA4A] px-2 py-1 text-[8px] font-bold text-[#0B2D5B] sm:text-[9px]">{discount}% OFF</span> : null}
           </div>
-          <img src={book.cover_url} alt={book.title} className="h-full w-full rounded-lg object-contain drop-shadow-[0_12px_14px_rgba(11,45,91,.16)] transition duration-500 group-hover:scale-[1.025]" />
+          <img src={coverSrc} alt={`${book.title} cover`} className="h-full w-full rounded-lg object-contain drop-shadow-[0_12px_14px_rgba(11,45,91,.16)] transition duration-500 group-hover:scale-[1.025]" />
         </div>
 
         <div className="flex flex-1 flex-col p-3.5 sm:p-4">
