@@ -5,6 +5,8 @@ import { CheckCircle2, Loader2, LockKeyhole, ShieldCheck, ShoppingBag } from "lu
 
 declare global { interface Window { Razorpay: any; } }
 
+const DELIVERY_ENDPOINT = "https://iasxygnoezjtizjdltag.supabase.co/functions/v1/ebookiee-deliver";
+
 export default function BuyButton({ bookId, title, price }: { bookId: string; title: string; price: number }) {
   const [loading, setLoading] = useState(false);
 
@@ -29,21 +31,43 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
         order_id: order.id,
         theme: { color: "#0B2D5B" },
         handler: async (payment: Record<string, string>) => {
-          const verifyResponse = await fetch("/api/verify-payment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...payment, bookId })
-          });
-          const verified = await verifyResponse.json();
-          if (!verifyResponse.ok || !verified.success) throw new Error(verified.message || "Payment verification failed");
-          if (verified.downloadUrl) window.location.href = verified.downloadUrl;
-          else alert("Payment verified. Your order has been recorded. If your download is not available yet, please contact eBookiee.store support with your payment ID.");
+          try {
+            setLoading(true);
+
+            const verifyResponse = await fetch("/api/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...payment, bookId })
+            });
+            const verified = await verifyResponse.json();
+            if (!verifyResponse.ok || !verified.success) throw new Error(verified.message || "Payment verification failed");
+
+            if (verified.downloadUrl) {
+              window.location.assign(verified.downloadUrl);
+              return;
+            }
+
+            const deliveryResponse = await fetch(DELIVERY_ENDPOINT, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...payment, bookId })
+            });
+            const delivery = await deliveryResponse.json();
+            if (!deliveryResponse.ok || !delivery.ok || !delivery.downloadUrl) {
+              throw new Error(delivery.error || "Payment succeeded, but secure delivery could not be created. Keep your payment ID and contact support.");
+            }
+
+            window.location.assign(delivery.downloadUrl);
+          } catch (error) {
+            alert(error instanceof Error ? error.message : "Payment completed, but delivery failed. Please contact support with your payment ID.");
+          } finally {
+            setLoading(false);
+          }
         }
       });
       secureCheckout.open();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Something went wrong");
-    } finally {
       setLoading(false);
     }
   }
@@ -60,21 +84,21 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
         </div>
 
         <button onClick={buy} disabled={loading} className="mt-3 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#F59E0B] px-5 py-4 text-[15px] font-bold text-[#0B2D5B] shadow-[0_10px_26px_rgba(245,158,11,.22)] transition hover:-translate-y-0.5 hover:bg-[#FDBA4A] disabled:cursor-not-allowed disabled:opacity-60 sm:text-base">
-          {loading ? <Loader2 className="animate-spin" size={19} /> : <ShoppingBag size={19} />} {loading ? "Opening secure payment..." : `Buy now · ₹${price}`}
+          {loading ? <Loader2 className="animate-spin" size={19} /> : <ShoppingBag size={19} />} {loading ? "Processing..." : `Buy now · ₹${price}`}
         </button>
 
         <div className="mt-3 grid gap-1.5 text-[11px] font-medium text-[#708095] min-[430px]:grid-cols-2 sm:text-xs">
           <span className="flex items-center gap-1.5"><LockKeyhole size={13} className="shrink-0 text-[#16815A]" /> Encrypted checkout</span>
-          <span className="flex items-center gap-1.5"><CheckCircle2 size={13} className="shrink-0 text-[#16815A]" /> Price verified on server</span>
+          <span className="flex items-center gap-1.5"><CheckCircle2 size={13} className="shrink-0 text-[#16815A]" /> Automatic secure download</span>
         </div>
-        <p className="mt-2.5 text-[10px] leading-4 text-[#8A98A9]">The final amount is shown before payment. Digital access is released only after successful verification.</p>
+        <p className="mt-2.5 text-[10px] leading-4 text-[#8A98A9]">The ebook is released only after server-side payment verification.</p>
       </div>
 
       <div className="fixed inset-x-0 bottom-[64px] z-[55] border-t border-[#E2E8F0] bg-white/96 px-3 py-2.5 shadow-[0_-10px_28px_rgba(11,45,91,.10)] backdrop-blur-xl md:hidden">
         <div className="mx-auto flex max-w-md items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="truncate text-[10px] font-semibold text-[#748396]">{title}</p>
-            <div className="mt-0.5 flex items-center gap-1.5"><span className="text-lg font-bold text-[#0B2D5B]">₹{price}</span><span className="text-[10px] font-semibold text-[#16815A]">Secure payment</span></div>
+            <div className="mt-0.5 flex items-center gap-1.5"><span className="text-lg font-bold text-[#0B2D5B]">₹{price}</span><span className="text-[10px] font-semibold text-[#16815A]">Secure delivery</span></div>
           </div>
           <button onClick={buy} disabled={loading} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#F59E0B] px-4 text-sm font-bold text-[#0B2D5B] shadow-[0_7px_18px_rgba(245,158,11,.20)] disabled:opacity-60">
             {loading ? <Loader2 className="animate-spin" size={17} /> : <ShoppingBag size={17} />} Buy now
