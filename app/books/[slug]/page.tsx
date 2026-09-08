@@ -16,6 +16,7 @@ export default async function BookPage({ params }: { params: Promise<{ slug: str
   const related = allBooks.filter((item) => item.category_slug === book.category_slug && item.id !== book.id).slice(0, 4);
   const discount = book.original_price && book.original_price > book.price ? Math.round((1 - book.price / book.original_price) * 100) : null;
   const savings = book.original_price && book.original_price > book.price ? book.original_price - book.price : null;
+  const coverSrc = `/api/book-cover/${book.id}`;
 
   return (
     <main className="min-h-screen bg-[#FAFAF8] pb-36 text-[#1F2937] md:pb-0">
@@ -28,7 +29,7 @@ export default async function BookPage({ params }: { params: Promise<{ slug: str
       <section className="mx-auto grid max-w-7xl gap-5 px-4 py-4 sm:px-6 sm:py-8 lg:grid-cols-[.84fr_1.16fr] lg:gap-10 lg:py-12">
         <div className="self-start rounded-[20px] border border-[#E1E7EE] bg-white p-3.5 shadow-[0_14px_36px_rgba(11,45,91,.055)] sm:rounded-[28px] sm:p-7 lg:sticky lg:top-24">
           <div className="rounded-2xl bg-[linear-gradient(145deg,#F3F6FA_0%,#FBFAF7_55%,#FFF1D3_100%)] p-3 sm:p-5">
-            <img src={book.cover_url} alt={book.title} className="mx-auto max-h-[390px] w-full rounded-xl object-contain drop-shadow-[0_20px_24px_rgba(11,45,91,.16)] sm:max-h-[610px]" />
+            <img src={coverSrc} alt={`${book.title} cover`} className="mx-auto max-h-[390px] w-full rounded-xl object-contain drop-shadow-[0_20px_24px_rgba(11,45,91,.16)] sm:max-h-[610px]" />
           </div>
         </div>
 
