@@ -34,12 +34,19 @@ const BOOKS = [
 ] as const;
 
 const UPLOAD_ENDPOINT = "https://iasxygnoezjtizjdltag.supabase.co/functions/v1/ebookiee-upload";
+const CHUNK_SIZE = 6 * 1024 * 1024;
+
+function prettyBytes(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
 
 export default function OwnerDeliveryPage() {
   const [bookId, setBookId] = useState(BOOKS[0][0]);
   const [setupCode, setSetupCode] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
+  const [progress, setProgress] = useState(0);
   const [busy, setBusy] = useState(false);
   const title = useMemo(() => BOOKS.find(([id]) => id === bookId)?.[1] || bookId, [bookId]);
 
@@ -47,17 +54,37 @@ export default function OwnerDeliveryPage() {
     event.preventDefault();
     if (!file) return setStatus("Choose the PDF first.");
     if (!setupCode) return setStatus("Enter the owner setup code.");
+    if (!file.name.toLowerCase().endsWith(".pdf") && file.type !== "application/pdf") return setStatus("Choose a PDF file.");
+
     try {
       setBusy(true);
-      setStatus(`Uploading ${title}...`);
-      const body = new FormData();
-      body.append("setupCode", setupCode);
-      body.append("bookId", bookId);
-      body.append("file", file);
-      const response = await fetch(UPLOAD_ENDPOINT, { method: "POST", body });
-      const data = await response.json();
-      if (!response.ok || !data.ok) throw new Error(data.error || "Upload failed");
-      setStatus(`Ready for sale: ${title}. Its secure PDF is now attached.`);
+      setProgress(0);
+      const uploadId = crypto.randomUUID();
+      const totalParts = Math.ceil(file.size / CHUNK_SIZE);
+
+      for (let partIndex = 0; partIndex < totalParts; partIndex += 1) {
+        const start = partIndex * CHUNK_SIZE;
+        const end = Math.min(file.size, start + CHUNK_SIZE);
+        const chunk = file.slice(start, end, "application/pdf");
+        setStatus(`Uploading ${title}: part ${partIndex + 1} of ${totalParts}...`);
+
+        const body = new FormData();
+        body.append("setupCode", setupCode);
+        body.append("bookId", bookId);
+        body.append("uploadId", uploadId);
+        body.append("partIndex", String(partIndex));
+        body.append("totalParts", String(totalParts));
+        body.append("originalFilename", file.name);
+        body.append("totalSize", String(file.size));
+        body.append("chunk", chunk, `${bookId}-${partIndex}.part`);
+
+        const response = await fetch(UPLOAD_ENDPOINT, { method: "POST", body });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) throw new Error(data.error || `Upload failed on part ${partIndex + 1}`);
+        setProgress(Math.round(((partIndex + 1) / totalParts) * 100));
+      }
+
+      setStatus(`Ready for sale: ${title}. Secure PDF attached (${prettyBytes(file.size)}).`);
       setFile(null);
       const input = document.getElementById("ebook-file") as HTMLInputElement | null;
       if (input) input.value = "";
@@ -73,24 +100,30 @@ export default function OwnerDeliveryPage() {
       <div className="mx-auto max-w-2xl rounded-3xl border border-[#DDE5EE] bg-white p-6 shadow-[0_20px_60px_rgba(11,45,91,.08)] sm:p-8">
         <p className="text-xs font-bold uppercase tracking-[.14em] text-[#A86106]">Owner only</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-[-.03em] text-[#0B2D5B]">Attach secure ebook files</h1>
-        <p className="mt-3 text-sm leading-6 text-[#66768A]">Upload the permitted PDF for each catalog title. A book only becomes payable after its PDF is attached, preventing paid orders without delivery.</p>
+        <p className="mt-3 text-sm leading-6 text-[#66768A]">Large PDFs are uploaded securely in smaller parts, so books over 50 MB are supported too. A title only becomes payable after every part is stored successfully.</p>
 
         <form onSubmit={upload} className="mt-7 grid gap-5">
           <label className="grid gap-2 text-sm font-semibold text-[#0B2D5B]">Book
-            <select value={bookId} onChange={(e) => setBookId(e.target.value as typeof bookId)} className="min-h-12 rounded-xl border border-[#CBD5E1] bg-white px-3 text-sm outline-none focus:border-[#F59E0B]">
+            <select value={bookId} onChange={(e) => setBookId(e.target.value as typeof bookId)} disabled={busy} className="min-h-12 rounded-xl border border-[#CBD5E1] bg-white px-3 text-sm outline-none focus:border-[#F59E0B] disabled:opacity-60">
               {BOOKS.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
             </select>
           </label>
 
           <label className="grid gap-2 text-sm font-semibold text-[#0B2D5B]">Owner setup code
-            <input type="password" value={setupCode} onChange={(e) => setSetupCode(e.target.value)} autoComplete="off" className="min-h-12 rounded-xl border border-[#CBD5E1] px-3 outline-none focus:border-[#F59E0B]" />
+            <input type="password" value={setupCode} onChange={(e) => setSetupCode(e.target.value)} disabled={busy} autoComplete="off" className="min-h-12 rounded-xl border border-[#CBD5E1] px-3 outline-none focus:border-[#F59E0B] disabled:opacity-60" />
           </label>
 
           <label className="grid gap-2 text-sm font-semibold text-[#0B2D5B]">PDF file
-            <input id="ebook-file" type="file" accept="application/pdf,.pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} className="rounded-xl border border-dashed border-[#B8C5D4] bg-[#F8FAFC] p-4 text-sm" />
+            <input id="ebook-file" type="file" accept="application/pdf,.pdf" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] || null)} className="rounded-xl border border-dashed border-[#B8C5D4] bg-[#F8FAFC] p-4 text-sm disabled:opacity-60" />
+            {file ? <span className="text-xs font-medium text-[#66768A]">{file.name} · {prettyBytes(file.size)}</span> : null}
           </label>
 
-          <button disabled={busy} className="min-h-13 rounded-xl bg-[#F59E0B] px-5 py-3.5 font-bold text-[#0B2D5B] disabled:opacity-60">{busy ? "Uploading securely..." : "Attach PDF & enable sale"}</button>
+          {busy ? <div className="grid gap-2">
+            <div className="h-2 overflow-hidden rounded-full bg-[#E8EEF5]"><div className="h-full rounded-full bg-[#F59E0B] transition-all" style={{ width: `${progress}%` }} /></div>
+            <p className="text-xs font-semibold text-[#66768A]">{progress}% uploaded. Keep this page open until it reaches 100%.</p>
+          </div> : null}
+
+          <button disabled={busy} className="min-h-13 rounded-xl bg-[#F59E0B] px-5 py-3.5 font-bold text-[#0B2D5B] disabled:opacity-60">{busy ? `Uploading ${progress}%...` : "Attach PDF & enable sale"}</button>
         </form>
 
         {status ? <div className="mt-5 rounded-xl border border-[#DDE5EE] bg-[#F8FAFC] p-4 text-sm font-medium text-[#44556A]">{status}</div> : null}
