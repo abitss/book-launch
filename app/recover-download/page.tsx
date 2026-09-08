@@ -21,6 +21,36 @@ const BOOKS = [
 
 const RECOVER_ENDPOINT = "https://iasxygnoezjtizjdltag.supabase.co/functions/v1/ebookiee-recover";
 
+async function startDelivery(payload: { downloadUrl?: string; downloadParts?: string[]; filename?: string }, onProgress: (message: string) => void) {
+  if (payload.downloadUrl) {
+    window.location.assign(payload.downloadUrl);
+    return;
+  }
+
+  if (Array.isArray(payload.downloadParts) && payload.downloadParts.length) {
+    const chunks: BlobPart[] = [];
+    for (let i = 0; i < payload.downloadParts.length; i += 1) {
+      onProgress(`Payment verified. Preparing your ebook: part ${i + 1} of ${payload.downloadParts.length}...`);
+      const response = await fetch(payload.downloadParts[i]);
+      if (!response.ok) throw new Error("A secure ebook part could not be downloaded. Please try again.");
+      chunks.push(await response.arrayBuffer());
+    }
+    const blob = new Blob(chunks, { type: "application/pdf" });
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = payload.filename || "ebook.pdf";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+    onProgress("Payment verified. Your ebook download has started.");
+    return;
+  }
+
+  throw new Error("Could not create the secure download.");
+}
+
 export default function RecoverDownloadPage() {
   const [paymentId, setPaymentId] = useState("");
   const [bookId, setBookId] = useState(BOOKS[0][0]);
@@ -38,9 +68,8 @@ export default function RecoverDownloadPage() {
         body: JSON.stringify({ paymentId: paymentId.trim(), bookId })
       });
       const data = await response.json();
-      if (!response.ok || !data.ok || !data.downloadUrl) throw new Error(data.error || "Could not recover download");
-      setMessage("Payment verified. Starting your secure download...");
-      window.location.assign(data.downloadUrl);
+      if (!response.ok || !data.ok) throw new Error(data.error || "Could not recover download");
+      await startDelivery(data, setMessage);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not recover download");
     } finally {
@@ -53,7 +82,7 @@ export default function RecoverDownloadPage() {
       <div className="mx-auto max-w-xl rounded-3xl border border-[#DDE5EE] bg-white p-6 shadow-[0_20px_60px_rgba(11,45,91,.08)] sm:p-8">
         <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#FFF3D7] text-[#A86106]"><Download size={22} /></div>
         <h1 className="mt-4 text-3xl font-semibold tracking-[-.03em] text-[#0B2D5B]">Recover your ebook</h1>
-        <p className="mt-2 text-sm leading-6 text-[#66768A]">Already paid but the download did not start? Enter the Razorpay payment ID and choose the book. We verify the payment on the server before releasing a private download link.</p>
+        <p className="mt-2 text-sm leading-6 text-[#66768A]">Already paid but the download did not start? Enter the Razorpay payment ID and choose the book. We verify the payment on the server before releasing a private download.</p>
 
         <form onSubmit={recover} className="mt-6 grid gap-4">
           <label className="grid gap-2 text-sm font-semibold text-[#0B2D5B]">Razorpay payment ID
@@ -65,12 +94,12 @@ export default function RecoverDownloadPage() {
             </select>
           </label>
           <button disabled={busy} className="inline-flex min-h-13 items-center justify-center gap-2 rounded-xl bg-[#F59E0B] px-5 py-3.5 font-bold text-[#0B2D5B] disabled:opacity-60">
-            {busy ? <Loader2 className="animate-spin" size={18} /> : <ShieldCheck size={18} />} {busy ? "Verifying..." : "Verify payment & download"}
+            {busy ? <Loader2 className="animate-spin" size={18} /> : <ShieldCheck size={18} />} {busy ? "Preparing secure download..." : "Verify payment & download"}
           </button>
         </form>
 
         {message ? <div className="mt-5 rounded-xl border border-[#DDE5EE] bg-[#F8FAFC] p-4 text-sm font-medium text-[#44556A]">{message}</div> : null}
-        <p className="mt-5 text-xs leading-5 text-[#8492A4]">The generated download link is temporary and the ebook remains in private storage.</p>
+        <p className="mt-5 text-xs leading-5 text-[#8492A4]">The ebook remains in private storage. Large PDFs are reconstructed securely in your browser after payment verification.</p>
         <Link href="/" className="mt-5 inline-block text-sm font-bold text-[#0B2D5B]">← Back to store</Link>
       </div>
     </main>
