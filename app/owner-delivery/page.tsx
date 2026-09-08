@@ -1,132 +1,237 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { DragEvent, FormEvent, useEffect, useMemo, useState } from "react";
 
 const BOOKS = [
-  ["indian-polity", "Indian Polity"],
-  ["wings-of-fire", "Wings of Fire"],
-  ["the-plague", "The Plague"],
-  ["the-theory-of-everything", "The Theory of Everything"],
-  ["think-and-grow-rich", "Think and Grow Rich"],
-  ["tiger-eyes", "Tiger Eyes"],
-  ["to-kill-a-mockingbird", "To Kill a Mockingbird"],
-  ["the-fault-in-our-stars", "The Fault in Our Stars"],
-  ["the-girl-with-the-dragon-tattoo", "The Girl with the Dragon Tattoo"],
-  ["the-kite-runner", "The Kite Runner"],
-  ["the-odyssey", "The Odyssey"],
-  ["brief-history-modern-india", "A Brief History of Modern India"],
-  ["the-book-thief", "The Book Thief"],
-  ["the-diary-of-a-young-girl", "The Diary of a Young Girl"],
-  ["history-of-medieval-india", "History of Medieval India"],
-  ["sita-warrior-of-mithila", "Sita: Warrior of Mithila"],
-  ["sapiens", "Sapiens"],
-  ["rich-dad-poor-dad", "Rich Dad Poor Dad"],
-  ["ancient-india-rs-sharma", "Ancient India"],
-  ["pride-and-prejudice-illustrated", "Pride and Prejudice"],
-  ["pinnacle-ssc-reasoning-8th-edition", "Pinnacle SSC Reasoning"],
-  ["a-gentleman-in-moscow", "A Gentleman in Moscow"],
-  ["a-thousand-splendid-suns", "A Thousand Splendid Suns"],
-  ["srimad-bhagavad-gita-hindi", "Shrimad Bhagavad Gita"],
-  ["modern-india-bipan-chandra", "Modern India by Bipan Chandra"],
-  ["dharmayoddha-kalki-avatar-of-vishnu", "Dharmayoddha Kalki"],
-  ["a-brief-history-of-time", "A Brief History of Time"],
-  ["12th-fail-hindi", "12th Fail"],
+  { id: "indian-polity", title: "Indian Polity", aliases: ["indian polity", "laxmikanth polity"] },
+  { id: "wings-of-fire", title: "Wings of Fire", aliases: ["wings of fire", "apj abdul kalam", "abdul kalam wings"] },
+  { id: "the-plague", title: "The Plague", aliases: ["the plague", "plague albert camus"] },
+  { id: "the-theory-of-everything", title: "The Theory of Everything", aliases: ["the theory of everything", "theory of everything hawking"] },
+  { id: "think-and-grow-rich", title: "Think and Grow Rich", aliases: ["think and grow rich", "napoleon hill"] },
+  { id: "tiger-eyes", title: "Tiger Eyes", aliases: ["tiger eyes", "judy blume tiger"] },
+  { id: "to-kill-a-mockingbird", title: "To Kill a Mockingbird", aliases: ["to kill a mockingbird", "harper lee mockingbird"] },
+  { id: "the-fault-in-our-stars", title: "The Fault in Our Stars", aliases: ["the fault in our stars", "john green fault"] },
+  { id: "the-girl-with-the-dragon-tattoo", title: "The Girl with the Dragon Tattoo", aliases: ["girl with the dragon tattoo", "stieg larsson dragon tattoo"] },
+  { id: "the-kite-runner", title: "The Kite Runner", aliases: ["the kite runner", "khaled hosseini kite"] },
+  { id: "the-odyssey", title: "The Odyssey", aliases: ["the odyssey", "homer odyssey"] },
+  { id: "brief-history-modern-india", title: "A Brief History of Modern India", aliases: ["a brief history of modern india", "brief history modern india", "spectrum modern india"] },
+  { id: "the-book-thief", title: "The Book Thief", aliases: ["the book thief", "markus zusak book thief"] },
+  { id: "the-diary-of-a-young-girl", title: "The Diary of a Young Girl", aliases: ["diary of a young girl", "anne frank diary"] },
+  { id: "history-of-medieval-india", title: "History of Medieval India", aliases: ["history of medieval india", "satish chandra medieval"] },
+  { id: "sita-warrior-of-mithila", title: "Sita: Warrior of Mithila", aliases: ["sita warrior of mithila", "amish sita"] },
+  { id: "sapiens", title: "Sapiens", aliases: ["sapiens", "yuval noah harari sapiens"] },
+  { id: "rich-dad-poor-dad", title: "Rich Dad Poor Dad", aliases: ["rich dad poor dad", "kiyosaki rich dad"] },
+  { id: "ancient-india-rs-sharma", title: "Ancient India", aliases: ["ancient india", "rs sharma ancient india", "r s sharma ancient india"] },
+  { id: "pride-and-prejudice-illustrated", title: "Pride and Prejudice", aliases: ["pride and prejudice", "jane austen pride"] },
+  { id: "pinnacle-ssc-reasoning-8th-edition", title: "Pinnacle SSC Reasoning", aliases: ["pinnacle ssc reasoning", "ssc reasoning pinnacle"] },
+  { id: "a-gentleman-in-moscow", title: "A Gentleman in Moscow", aliases: ["a gentleman in moscow", "amor towles gentleman"] },
+  { id: "a-thousand-splendid-suns", title: "A Thousand Splendid Suns", aliases: ["a thousand splendid suns", "khaled hosseini thousand splendid"] },
+  { id: "srimad-bhagavad-gita-hindi", title: "Shrimad Bhagavad Gita", aliases: ["srimad bhagavad gita", "shrimad bhagavad gita", "bhagavad gita hindi", "भगवद गीता", "श्रीमद्भगवद्गीता"] },
+  { id: "modern-india-bipan-chandra", title: "Modern India by Bipan Chandra", aliases: ["modern india bipan chandra", "bipan chandra modern india", "modern india old ncert"] },
+  { id: "dharmayoddha-kalki-avatar-of-vishnu", title: "Dharmayoddha Kalki", aliases: ["dharmayoddha kalki", "kalki avatar of vishnu", "kevin missal kalki"] },
+  { id: "a-brief-history-of-time", title: "A Brief History of Time", aliases: ["a brief history of time", "brief history of time hawking"] },
+  { id: "12th-fail-hindi", title: "12th Fail", aliases: ["12th fail", "twelfth fail", "12 fail", "ट्वेल्थ फेल"] },
 ] as const;
 
 const UPLOAD_ENDPOINT = "https://qsbljflookzgrdxzessb.supabase.co/functions/v1/ebookiee-upload";
+const AVAILABILITY_ENDPOINT = "https://qsbljflookzgrdxzessb.supabase.co/functions/v1/ebookiee-availability";
 const CHUNK_SIZE = 6 * 1024 * 1024;
+
+type Match = { file: File; bookId: string | null; title: string; confidence: number; state: "queued" | "uploading" | "ready" | "failed" | "unmatched"; progress: number; error?: string };
 
 function prettyBytes(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
+function normalize(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/\.pdf$/i, "")
+    .replace(/[_–—-]+/g, " ")
+    .replace(/[()\[\]{}.,:;!'\"|]/g, " ")
+    .replace(/\b(ebook|pdf|book|final|copy|edition|ed|download|english|hindi|complete|latest|new)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokens(value: string) {
+  return new Set(normalize(value).split(" ").filter((token) => token.length > 2));
+}
+
+function similarity(a: string, b: string) {
+  const na = normalize(a);
+  const nb = normalize(b);
+  if (!na || !nb) return 0;
+  if (na.includes(nb) || nb.includes(na)) return Math.min(1, 0.82 + Math.min(na.length, nb.length) / Math.max(na.length, nb.length) * 0.18);
+  const ta = tokens(na);
+  const tb = tokens(nb);
+  if (!ta.size || !tb.size) return 0;
+  let intersection = 0;
+  ta.forEach((token) => { if (tb.has(token)) intersection += 1; });
+  const union = new Set([...ta, ...tb]).size;
+  return union ? intersection / union : 0;
+}
+
+function matchBook(file: File) {
+  let best = { bookId: null as string | null, title: "Unmatched", confidence: 0 };
+  for (const book of BOOKS) {
+    const candidates = [book.title, ...book.aliases];
+    const score = Math.max(...candidates.map((candidate) => similarity(file.name, candidate)));
+    if (score > best.confidence) best = { bookId: book.id, title: book.title, confidence: score };
+  }
+  return best.confidence >= 0.48 ? best : { bookId: null, title: "Unmatched", confidence: best.confidence };
+}
+
+function buildMatches(files: File[]) {
+  return files
+    .filter((file) => file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf"))
+    .map((file) => {
+      const match = matchBook(file);
+      return {
+        file,
+        ...match,
+        state: match.bookId ? "queued" as const : "unmatched" as const,
+        progress: 0,
+      };
+    });
+}
+
 export default function OwnerDeliveryPage() {
-  const [bookId, setBookId] = useState(BOOKS[0][0]);
   const [setupCode, setSetupCode] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState("");
-  const [progress, setProgress] = useState(0);
+  const [items, setItems] = useState<Match[]>([]);
   const [busy, setBusy] = useState(false);
-  const title = useMemo(() => BOOKS.find(([id]) => id === bookId)?.[1] || bookId, [bookId]);
+  const [dragging, setDragging] = useState(false);
+  const [readyIds, setReadyIds] = useState<string[]>([]);
+  const [status, setStatus] = useState("Drop all your ebook PDFs here. I will identify the books and connect them automatically.");
 
-  async function upload(event: FormEvent) {
+  const matched = useMemo(() => items.filter((item) => item.bookId), [items]);
+  const unmatched = useMemo(() => items.filter((item) => !item.bookId), [items]);
+
+  useEffect(() => {
+    fetch(AVAILABILITY_ENDPOINT, { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => setReadyIds(Array.isArray(data.readyBookIds) ? data.readyBookIds : []))
+      .catch(() => undefined);
+  }, []);
+
+  function addFiles(files: File[]) {
+    const next = buildMatches(files);
+    setItems(next);
+    const autoMatched = next.filter((item) => item.bookId).length;
+    const notMatched = next.length - autoMatched;
+    setStatus(notMatched ? `${autoMatched} PDFs matched automatically. ${notMatched} need a clearer filename.` : `${autoMatched} PDFs matched automatically. Ready to sync.`);
+  }
+
+  function onDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
-    if (!file) return setStatus("Choose the PDF first.");
-    if (!setupCode) return setStatus("Enter the owner setup code.");
-    if (!file.name.toLowerCase().endsWith(".pdf") && file.type !== "application/pdf") return setStatus("Choose a PDF file.");
+    setDragging(false);
+    addFiles(Array.from(event.dataTransfer.files));
+  }
 
-    try {
-      setBusy(true);
-      setProgress(0);
-      const uploadId = crypto.randomUUID();
-      const totalParts = Math.ceil(file.size / CHUNK_SIZE);
+  function patchItem(index: number, patch: Partial<Match>) {
+    setItems((current) => current.map((item, i) => i === index ? { ...item, ...patch } : item));
+  }
 
-      for (let partIndex = 0; partIndex < totalParts; partIndex += 1) {
-        const start = partIndex * CHUNK_SIZE;
-        const end = Math.min(file.size, start + CHUNK_SIZE);
-        const chunk = file.slice(start, end, "application/pdf");
-        setStatus(`Uploading ${title}: part ${partIndex + 1} of ${totalParts}...`);
+  async function uploadOne(item: Match, index: number) {
+    if (!item.bookId) return;
+    const uploadId = crypto.randomUUID();
+    const totalParts = Math.ceil(item.file.size / CHUNK_SIZE);
+    patchItem(index, { state: "uploading", progress: 0, error: undefined });
 
-        const body = new FormData();
-        body.append("setupCode", setupCode);
-        body.append("bookId", bookId);
-        body.append("uploadId", uploadId);
-        body.append("partIndex", String(partIndex));
-        body.append("totalParts", String(totalParts));
-        body.append("originalFilename", file.name);
-        body.append("totalSize", String(file.size));
-        body.append("chunk", chunk, `${bookId}-${partIndex}.part`);
+    for (let partIndex = 0; partIndex < totalParts; partIndex += 1) {
+      const start = partIndex * CHUNK_SIZE;
+      const end = Math.min(item.file.size, start + CHUNK_SIZE);
+      const chunk = item.file.slice(start, end, "application/pdf");
+      const body = new FormData();
+      body.append("setupCode", setupCode);
+      body.append("bookId", item.bookId);
+      body.append("uploadId", uploadId);
+      body.append("partIndex", String(partIndex));
+      body.append("totalParts", String(totalParts));
+      body.append("originalFilename", item.file.name);
+      body.append("totalSize", String(item.file.size));
+      body.append("chunk", chunk, `${item.bookId}-${partIndex}.part`);
 
-        const response = await fetch(UPLOAD_ENDPOINT, { method: "POST", body });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok || !data.ok) throw new Error(data.error || `Upload failed on part ${partIndex + 1}`);
-        setProgress(Math.round(((partIndex + 1) / totalParts) * 100));
-      }
-
-      setStatus(`Ready for sale: ${title}. Secure PDF attached (${prettyBytes(file.size)}).`);
-      setFile(null);
-      const input = document.getElementById("ebook-file") as HTMLInputElement | null;
-      if (input) input.value = "";
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Upload failed");
-    } finally {
-      setBusy(false);
+      const response = await fetch(UPLOAD_ENDPOINT, { method: "POST", body });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.error || `Upload failed on part ${partIndex + 1}`);
+      patchItem(index, { progress: Math.round(((partIndex + 1) / totalParts) * 100) });
     }
+
+    patchItem(index, { state: "ready", progress: 100 });
+    setReadyIds((current) => Array.from(new Set([...current, item.bookId!])))
+  }
+
+  async function syncLibrary(event: FormEvent) {
+    event.preventDefault();
+    if (!setupCode) return setStatus("Enter the owner setup code once, then sync the whole library.");
+    if (!matched.length) return setStatus("Add PDFs first. I could not find any matched books to upload.");
+
+    setBusy(true);
+    let succeeded = 0;
+    let failed = 0;
+
+    for (let index = 0; index < items.length; index += 1) {
+      const item = items[index];
+      if (!item.bookId) continue;
+      setStatus(`Auto-syncing ${item.title} (${succeeded + failed + 1} of ${matched.length})...`);
+      try {
+        await uploadOne(item, index);
+        succeeded += 1;
+      } catch (error) {
+        failed += 1;
+        patchItem(index, { state: "failed", error: error instanceof Error ? error.message : "Upload failed" });
+      }
+    }
+
+    setBusy(false);
+    setStatus(failed ? `${succeeded} books are ready for sale. ${failed} failed and can be retried.` : `Library sync complete. ${succeeded} books are now securely attached and enabled for sale.`);
   }
 
   return (
     <main className="min-h-screen bg-[#F7F9FC] px-4 py-10 text-[#1F2937]">
-      <div className="mx-auto max-w-2xl rounded-3xl border border-[#DDE5EE] bg-white p-6 shadow-[0_20px_60px_rgba(11,45,91,.08)] sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-[.14em] text-[#A86106]">Owner only</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-.03em] text-[#0B2D5B]">Attach secure ebook files</h1>
-        <p className="mt-3 text-sm leading-6 text-[#66768A]">Large PDFs are uploaded securely in smaller parts. A title only becomes payable after every part is stored successfully.</p>
+      <div className="mx-auto max-w-4xl rounded-3xl border border-[#DDE5EE] bg-white p-6 shadow-[0_20px_60px_rgba(11,45,91,.08)] sm:p-8">
+        <p className="text-xs font-bold uppercase tracking-[.14em] text-[#A86106]">Owner automation</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-[-.03em] text-[#0B2D5B]">Automatic ebook library sync</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#66768A]">No more selecting one book at a time. Add all PDFs together. eBookiee matches each filename to the catalog, uploads large files in secure chunks, links the right PDF to the right title, and enables checkout only after the upload is complete.</p>
 
-        <form onSubmit={upload} className="mt-7 grid gap-5">
-          <label className="grid gap-2 text-sm font-semibold text-[#0B2D5B]">Book
-            <select value={bookId} onChange={(e) => setBookId(e.target.value as typeof bookId)} disabled={busy} className="min-h-12 rounded-xl border border-[#CBD5E1] bg-white px-3 text-sm outline-none focus:border-[#F59E0B] disabled:opacity-60">
-              {BOOKS.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-            </select>
-          </label>
-
+        <form onSubmit={syncLibrary} className="mt-7 grid gap-5">
           <label className="grid gap-2 text-sm font-semibold text-[#0B2D5B]">Owner setup code
-            <input type="password" value={setupCode} onChange={(e) => setSetupCode(e.target.value)} disabled={busy} autoComplete="off" className="min-h-12 rounded-xl border border-[#CBD5E1] px-3 outline-none focus:border-[#F59E0B] disabled:opacity-60" />
+            <input type="password" value={setupCode} onChange={(e) => setSetupCode(e.target.value)} disabled={busy} autoComplete="off" placeholder="Enter once for this sync" className="min-h-12 rounded-xl border border-[#CBD5E1] px-3 outline-none focus:border-[#F59E0B] disabled:opacity-60" />
           </label>
 
-          <label className="grid gap-2 text-sm font-semibold text-[#0B2D5B]">PDF file
-            <input id="ebook-file" type="file" accept="application/pdf,.pdf" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] || null)} className="rounded-xl border border-dashed border-[#B8C5D4] bg-[#F8FAFC] p-4 text-sm disabled:opacity-60" />
-            {file ? <span className="text-xs font-medium text-[#66768A]">{file.name} · {prettyBytes(file.size)}</span> : null}
-          </label>
+          <div onDragOver={(e) => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={onDrop} className={`rounded-2xl border-2 border-dashed p-7 text-center transition ${dragging ? "border-[#F59E0B] bg-[#FFF8E8]" : "border-[#B8C5D4] bg-[#F8FAFC]"}`}>
+            <p className="text-base font-bold text-[#0B2D5B]">Drop all ebook PDFs here</p>
+            <p className="mt-1 text-xs leading-5 text-[#708095]">or choose many PDFs together. Large files are handled automatically.</p>
+            <label className="mt-4 inline-flex cursor-pointer items-center justify-center rounded-xl bg-[#0B2D5B] px-5 py-3 text-sm font-bold text-white">
+              Choose PDFs
+              <input type="file" accept="application/pdf,.pdf" multiple disabled={busy} onChange={(e) => addFiles(Array.from(e.target.files || []))} className="hidden" />
+            </label>
+          </div>
 
-          {busy ? <div className="grid gap-2">
-            <div className="h-2 overflow-hidden rounded-full bg-[#E8EEF5]"><div className="h-full rounded-full bg-[#F59E0B] transition-all" style={{ width: `${progress}%` }} /></div>
-            <p className="text-xs font-semibold text-[#66768A]">{progress}% uploaded. Keep this page open until it reaches 100%.</p>
+          {items.length ? <div className="grid gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-bold text-[#0B2D5B]">{matched.length} matched · {unmatched.length} unmatched · {readyIds.length} currently ready</p>
+              <button type="button" onClick={() => { setItems([]); setStatus("Add a fresh batch of PDFs."); }} disabled={busy} className="text-xs font-bold text-[#66768A] underline disabled:opacity-50">Clear batch</button>
+            </div>
+            <div className="max-h-[430px] overflow-auto rounded-2xl border border-[#E1E8F0]">
+              {items.map((item, index) => <div key={`${item.file.name}-${index}`} className="grid gap-2 border-b border-[#EEF2F6] p-4 last:border-b-0 sm:grid-cols-[1fr_auto] sm:items-center">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-[#24364B]">{item.file.name}</p>
+                  <p className="mt-1 text-xs text-[#708095]">{item.bookId ? `→ ${item.title} · ${Math.round(item.confidence * 100)}% match · ${prettyBytes(item.file.size)}` : "Could not match automatically. Rename the PDF closer to the book title and add it again."}</p>
+                  {item.state === "uploading" ? <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#E8EEF5]"><div className="h-full rounded-full bg-[#F59E0B] transition-all" style={{ width: `${item.progress}%` }} /></div> : null}
+                  {item.error ? <p className="mt-1 text-xs font-semibold text-red-600">{item.error}</p> : null}
+                </div>
+                <span className={`w-fit rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${item.state === "ready" ? "bg-[#E9F8F0] text-[#13704F]" : item.state === "failed" || item.state === "unmatched" ? "bg-[#FFF0F0] text-[#A33A3A]" : item.state === "uploading" ? "bg-[#FFF4D9] text-[#8A5B00]" : "bg-[#EEF3F8] text-[#53677C]"}`}>{item.state === "uploading" ? `${item.progress}%` : item.state}</span>
+              </div>)}
+            </div>
           </div> : null}
 
-          <button disabled={busy} className="min-h-13 rounded-xl bg-[#F59E0B] px-5 py-3.5 font-bold text-[#0B2D5B] disabled:opacity-60">{busy ? `Uploading ${progress}%...` : "Attach PDF & enable sale"}</button>
+          <button disabled={busy || !matched.length} className="min-h-14 rounded-xl bg-[#F59E0B] px-5 py-4 text-base font-bold text-[#0B2D5B] shadow-[0_10px_26px_rgba(245,158,11,.20)] disabled:cursor-not-allowed disabled:opacity-50">{busy ? "Auto-syncing library..." : matched.length ? `Sync ${matched.length} matched PDFs automatically` : "Add PDFs to start"}</button>
         </form>
 
-        {status ? <div className="mt-5 rounded-xl border border-[#DDE5EE] bg-[#F8FAFC] p-4 text-sm font-medium text-[#44556A]">{status}</div> : null}
+        <div className="mt-5 rounded-xl border border-[#DDE5EE] bg-[#F8FAFC] p-4 text-sm font-medium leading-6 text-[#44556A]">{status}</div>
       </div>
     </main>
   );
