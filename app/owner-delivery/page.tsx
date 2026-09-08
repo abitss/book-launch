@@ -33,7 +33,7 @@ const BOOKS = [
   ["12th-fail-hindi", "12th Fail"],
 ] as const;
 
-const UPLOAD_ENDPOINT = "https://iasxygnoezjtizjdltag.supabase.co/functions/v1/ebookiee-upload";
+const UPLOAD_ENDPOINT = "https://qsbljflookzgrdxzessb.supabase.co/functions/v1/ebookiee-upload";
 const CHUNK_SIZE = 6 * 1024 * 1024;
 
 function prettyBytes(bytes: number) {
@@ -100,7 +100,7 @@ export default function OwnerDeliveryPage() {
       <div className="mx-auto max-w-2xl rounded-3xl border border-[#DDE5EE] bg-white p-6 shadow-[0_20px_60px_rgba(11,45,91,.08)] sm:p-8">
         <p className="text-xs font-bold uppercase tracking-[.14em] text-[#A86106]">Owner only</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-[-.03em] text-[#0B2D5B]">Attach secure ebook files</h1>
-        <p className="mt-3 text-sm leading-6 text-[#66768A]">Large PDFs are uploaded securely in smaller parts, so books over 50 MB are supported too. A title only becomes payable after every part is stored successfully.</p>
+        <p className="mt-3 text-sm leading-6 text-[#66768A]">Large PDFs are uploaded securely in smaller parts. A title only becomes payable after every part is stored successfully.</p>
 
         <form onSubmit={upload} className="mt-7 grid gap-5">
           <label className="grid gap-2 text-sm font-semibold text-[#0B2D5B]">Book
