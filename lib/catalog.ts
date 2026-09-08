@@ -5,6 +5,7 @@ import { bookOverrides } from "@/data/catalog-overrides";
 const supabaseUrl = process.env.SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const DELIVERY_BUCKET = "ebookiee-ebooks";
+const AVAILABILITY_URL = "https://iasxygnoezjtizjdltag.supabase.co/functions/v1/ebookiee-availability";
 
 const baseBooks: Book[] = [...books, ...extraBooks].map((book) => ({
   ...book,
@@ -38,12 +39,23 @@ async function dbFetch<T>(path: string, init?: RequestInit): Promise<T> {
 type BookFileRow = { book_id: string; storage_path: string };
 
 async function deliveryMap(): Promise<Map<string, string>> {
-  if (!hasSupabase()) return new Map();
+  if (hasSupabase()) {
+    try {
+      const rows = await dbFetch<BookFileRow[]>("ebookiee_book_files?select=book_id,storage_path");
+      return new Map((rows || []).map((row) => [row.book_id, row.storage_path]));
+    } catch (error) {
+      console.error("Unable to load ebook delivery map from configured Supabase", error);
+    }
+  }
+
   try {
-    const rows = await dbFetch<BookFileRow[]>("ebookiee_book_files?select=book_id,storage_path");
-    return new Map((rows || []).map((row) => [row.book_id, row.storage_path]));
+    const response = await fetch(AVAILABILITY_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Availability service returned ${response.status}`);
+    const data = await response.json();
+    const ids: string[] = Array.isArray(data.readyBookIds) ? data.readyBookIds : [];
+    return new Map(ids.map((id) => [id, `managed:${id}`]));
   } catch (error) {
-    console.error("Unable to load ebook delivery map", error);
+    console.error("Unable to load ebook delivery availability", error);
     return new Map();
   }
 }
@@ -98,7 +110,7 @@ export async function markOrderPaid(razorpayOrderId: string, paymentId: string) 
 }
 
 export async function createSignedBookUrl(filePath: string) {
-  if (!supabaseUrl || !serviceKey) return null;
+  if (!supabaseUrl || !serviceKey || filePath.startsWith("managed:")) return null;
   const response = await fetch(`${supabaseUrl}/storage/v1/object/sign/${DELIVERY_BUCKET}/${filePath}`, {
     method: "POST",
     headers: {
@@ -112,38 +124,4 @@ export async function createSignedBookUrl(filePath: string) {
   const data = await response.json();
   const signed = data.signedURL || data.signedUrl;
   return signed ? `${supabaseUrl}/storage/v1${signed}` : null;
-}
-
-export async function saveBookFileMapping(bookId: string, storagePath: string, originalFilename: string, sizeBytes: number) {
-  if (!hasSupabase()) throw new Error("Supabase is not configured");
-  return dbFetch("ebookiee_book_files?on_conflict=book_id", {
-    method: "POST",
-    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
-    body: JSON.stringify({
-      book_id: bookId,
-      storage_path: storagePath,
-      original_filename: originalFilename,
-      mime_type: "application/pdf",
-      size_bytes: sizeBytes,
-      updated_at: new Date().toISOString()
-    })
-  });
-}
-
-export async function uploadBookPdf(bookId: string, file: File) {
-  if (!supabaseUrl || !serviceKey) throw new Error("Supabase is not configured");
-  const storagePath = `${bookId}/${crypto.randomUUID()}.pdf`;
-  const response = await fetch(`${supabaseUrl}/storage/v1/object/${DELIVERY_BUCKET}/${storagePath}`, {
-    method: "POST",
-    headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-      "Content-Type": "application/pdf",
-      "x-upsert": "false"
-    },
-    body: Buffer.from(await file.arrayBuffer())
-  });
-  if (!response.ok) throw new Error(await response.text());
-  await saveBookFileMapping(bookId, storagePath, file.name, file.size);
-  return storagePath;
 }
