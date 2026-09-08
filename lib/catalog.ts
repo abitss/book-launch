@@ -5,11 +5,19 @@ import { bookOverrides } from "@/data/catalog-overrides";
 const supabaseUrl = process.env.SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const withOverrides = (book: Book): Book => ({
-  ...book,
-  ...(bookOverrides[book.id] || {}),
-  purchasable: true
-});
+const withOverrides = (book: Book): Book => {
+  const merged = {
+    ...book,
+    ...(bookOverrides[book.id] || {})
+  };
+
+  // A title must have an attached private delivery file before checkout can open.
+  // This prevents a successful payment from ending without a download.
+  return {
+    ...merged,
+    purchasable: Boolean(merged.file_path)
+  };
+};
 
 const allBooks = [...books, ...extraBooks].map(withOverrides);
 const allCategories = [...categories, ...extraCategories];
