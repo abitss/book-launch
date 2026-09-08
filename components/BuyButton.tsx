@@ -7,6 +7,34 @@ declare global { interface Window { Razorpay: any; } }
 
 const DELIVERY_ENDPOINT = "https://iasxygnoezjtizjdltag.supabase.co/functions/v1/ebookiee-deliver";
 
+async function startDelivery(payload: { downloadUrl?: string; downloadParts?: string[]; filename?: string }) {
+  if (payload.downloadUrl) {
+    window.location.assign(payload.downloadUrl);
+    return;
+  }
+
+  if (Array.isArray(payload.downloadParts) && payload.downloadParts.length) {
+    const chunks: BlobPart[] = [];
+    for (const url of payload.downloadParts) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("A secure ebook part could not be downloaded. Please try recovery with your payment ID.");
+      chunks.push(await response.arrayBuffer());
+    }
+    const blob = new Blob(chunks, { type: "application/pdf" });
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = payload.filename || "ebook.pdf";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+    return;
+  }
+
+  throw new Error("Secure download could not be created. Please use Recover Download with your payment ID.");
+}
+
 export default function BuyButton({ bookId, title, price }: { bookId: string; title: string; price: number }) {
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +71,7 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
             if (!verifyResponse.ok || !verified.success) throw new Error(verified.message || "Payment verification failed");
 
             if (verified.downloadUrl) {
-              window.location.assign(verified.downloadUrl);
+              await startDelivery(verified);
               return;
             }
 
@@ -53,13 +81,13 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
               body: JSON.stringify({ ...payment, bookId })
             });
             const delivery = await deliveryResponse.json();
-            if (!deliveryResponse.ok || !delivery.ok || !delivery.downloadUrl) {
-              throw new Error(delivery.error || "Payment succeeded, but secure delivery could not be created. Keep your payment ID and contact support.");
+            if (!deliveryResponse.ok || !delivery.ok) {
+              throw new Error(delivery.error || "Payment succeeded, but secure delivery could not be created. Keep your payment ID and use Recover Download.");
             }
 
-            window.location.assign(delivery.downloadUrl);
+            await startDelivery(delivery);
           } catch (error) {
-            alert(error instanceof Error ? error.message : "Payment completed, but delivery failed. Please contact support with your payment ID.");
+            alert(error instanceof Error ? error.message : "Payment completed, but delivery failed. Please use Recover Download with your payment ID.");
           } finally {
             setLoading(false);
           }
