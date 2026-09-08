@@ -5,9 +5,9 @@ import { CheckCircle2, Loader2, LockKeyhole, ShieldCheck, ShoppingBag } from "lu
 
 declare global { interface Window { Razorpay: any; } }
 
-const DELIVERY_ENDPOINT = "https://iasxygnoezjtizjdltag.supabase.co/functions/v1/ebookiee-deliver";
+const DELIVERY_ENDPOINT = "https://qsbljflookzgrdxzessb.supabase.co/functions/v1/ebookiee-deliver";
 
-async function startDelivery(payload: { downloadUrl?: string; downloadParts?: string[]; filename?: string }) {
+async function startDelivery(payload: { downloadUrl?: string; downloadParts?: string[]; originalFilename?: string; filename?: string }) {
   if (payload.downloadUrl) {
     window.location.assign(payload.downloadUrl);
     return;
@@ -24,7 +24,7 @@ async function startDelivery(payload: { downloadUrl?: string; downloadParts?: st
     const objectUrl = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = objectUrl;
-    anchor.download = payload.filename || "ebook.pdf";
+    anchor.download = payload.originalFilename || payload.filename || "ebook.pdf";
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
