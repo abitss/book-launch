@@ -51,5 +51,22 @@ export const bookOverrides: Record<string, Partial<Book>> = {
   },
   "the-kite-runner": {
     cover_url: "https://static.tumblr.com/sf0rok1/UEem1juax/kiterunner.jpg"
+  },
+
+  "the-theory-of-everything": {
+    cover_url: "https://books.google.com/books/content?id=dEEbvgAACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api"
+  },
+  "think-and-grow-rich": {
+    cover_url: "https://books.google.com/books/content?id=5dUsDwAAQBAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api"
+  },
+  "tiger-eyes": {
+    cover_url: "https://books.google.com/books/content?id=rPVMnufpPtkC&printsec=frontcover&img=1&zoom=2&source=gbs_api"
+  },
+  "to-kill-a-mockingbird": {
+    cover_url: "https://books.google.com/books/content?id=weBBYBa5iZUC&printsec=frontcover&img=1&zoom=2&source=gbs_api"
+  },
+  "wings-of-fire": {
+    cover_url: "https://www.presidentofindia.gov.in/files/11books1lr.jpg",
+    pages: 180
   }
 };
