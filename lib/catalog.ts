@@ -3,8 +3,9 @@ import { extraBooks, extraCategories, extraSubcategories } from "@/data/catalog-
 import { bookOverrides } from "@/data/catalog-overrides";
 
 const AVAILABILITY_URL = "https://qsbljflookzgrdxzessb.supabase.co/functions/v1/ebookiee-availability";
+const DYNAMIC_CATALOG_URL = "https://qsbljflookzgrdxzessb.supabase.co/functions/v1/ebookiee-catalog";
 
-const baseBooks: Book[] = [...books, ...extraBooks].map((book) => ({
+const staticBooks: Book[] = [...books, ...extraBooks].map((book) => ({
   ...book,
   ...(bookOverrides[book.id] || {})
 }));
@@ -24,14 +25,38 @@ async function deliveryMap(): Promise<Map<string, string>> {
   }
 }
 
+async function dynamicBooks(): Promise<Book[]> {
+  try {
+    const response = await fetch(DYNAMIC_CATALOG_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Dynamic catalog returned ${response.status}`);
+    const data = await response.json();
+    if (!data?.ok || !Array.isArray(data.books)) return [];
+    return data.books.map((book: Book) => ({
+      ...book,
+      original_price: book.original_price ?? null,
+      cover_url: book.cover_url || "/cover.png",
+      file_path: null,
+      purchasable: false,
+      active: book.active !== false,
+    }));
+  } catch (error) {
+    console.error("Unable to load dynamic ebook catalog", error);
+    return [];
+  }
+}
+
 async function hydratedBooks(): Promise<Book[]> {
-  const files = await deliveryMap();
-  return baseBooks.map((book) => {
+  const [files, dynamic] = await Promise.all([deliveryMap(), dynamicBooks()]);
+  const merged = new Map<string, Book>();
+  staticBooks.forEach((book) => merged.set(book.id, book));
+  dynamic.forEach((book) => merged.set(book.id, book));
+
+  return Array.from(merged.values()).map((book) => {
     const mappedPath = files.get(book.id) || null;
     return {
       ...book,
       file_path: mappedPath,
-      purchasable: Boolean(mappedPath)
+      purchasable: Boolean(mappedPath) && book.active !== false,
     };
   });
 }
