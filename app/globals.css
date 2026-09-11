@@ -1,15 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --brand-navy: #0B2D5B;
-  --brand-navy-2: #123E73;
-  --brand-orange: #F59E0B;
-  --brand-gold: #FDBA4A;
-  --brand-ivory: #FFFCF7;
-  --brand-surface: #FFFFFF;
-  --brand-text: #1F2937;
-  --brand-muted: #64748B;
-  --brand-border: #E4E9F0;
+  --brand-navy: #08254d;
+  --brand-navy-2: #103a6d;
+  --brand-ink: #172033;
+  --brand-orange: #f59e0b;
+  --brand-gold: #f7b733;
+  --brand-ivory: #fbf8f1;
+  --brand-paper: #fffdf9;
+  --brand-surface: #ffffff;
+  --brand-text: #253044;
+  --brand-muted: #6f7d90;
+  --brand-border: #e7e2d8;
   --background: var(--brand-ivory);
   --foreground: var(--brand-text);
 }
@@ -35,7 +37,10 @@ body {
   max-width: 100%;
   min-width: 0;
   overflow-x: hidden;
-  background: var(--background);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(245,158,11,.07), transparent 28rem),
+    radial-gradient(circle at 90% 8%, rgba(8,37,77,.05), transparent 24rem),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -55,10 +60,47 @@ a { text-decoration: none; }
 button, input, textarea, select { font: inherit; min-width: 0; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button { cursor: pointer; }
-::selection { background: #FDE3A7; color: #0B2D5B; }
+::selection { background: #f8d98f; color: #08254d; }
 
-.brand-soft-shadow { box-shadow: 0 14px 50px rgba(11,45,91,.08); }
+.editorial-serif {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -.035em;
+}
+
+.soft-grid {
+  background-image:
+    linear-gradient(rgba(8,37,77,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8,37,77,.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.paper-surface {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,253,249,.98)),
+    #fff;
+  border: 1px solid rgba(214,207,195,.82);
+  box-shadow: 0 18px 60px rgba(8,37,77,.07);
+}
+
+.glass-surface {
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(255,255,255,.72);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 14px 44px rgba(8,37,77,.08);
+}
+
+.brand-soft-shadow { box-shadow: 0 18px 60px rgba(8,37,77,.08); }
 .brand-card { border: 1px solid var(--brand-border); background: var(--brand-surface); }
+
+@keyframes float-card {
+  0%, 100% { transform: translateY(0) rotate(var(--book-rotation, 0deg)); }
+  50% { transform: translateY(-8px) rotate(var(--book-rotation, 0deg)); }
+}
+
+.book-float { animation: float-card 6s ease-in-out infinite; }
+.book-float:nth-child(2) { animation-delay: -2s; }
+.book-float:nth-child(3) { animation-delay: -4s; }
 
 @media (max-width: 767px) {
   input, textarea, select { font-size: 16px; }
