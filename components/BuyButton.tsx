@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Loader2, LockKeyhole, ShieldCheck, ShoppingBag } from "lucide-react";
+import { CheckCircle2, Download, Loader2, LockKeyhole, ShieldCheck, ShoppingBag } from "lucide-react";
 
 declare global { interface Window { Razorpay: any; } }
 
@@ -57,7 +57,7 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
         name: "eBookiee.store",
         description: title,
         order_id: order.id,
-        theme: { color: "#0B2D5B" },
+        theme: { color: "#08254D" },
         handler: async (payment: Record<string, string>) => {
           try {
             setLoading(true);
@@ -102,34 +102,40 @@ export default function BuyButton({ bookId, title, price }: { bookId: string; ti
 
   return (
     <>
-      <div className="rounded-[18px] border border-[#DEE5ED] bg-white p-3.5 shadow-[0_14px_38px_rgba(11,45,91,.07)] sm:rounded-[22px] sm:p-4">
-        <div className="flex items-center justify-between gap-4 border-b border-[#EEF2F6] pb-3">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[.12em] text-[#8A98A9]">Total</p>
-            <p className="mt-0.5 text-2xl font-bold tracking-[-.03em] text-[#0B2D5B]">₹{price}</p>
+      <div className="overflow-hidden rounded-[26px] border border-[#DDD4C5] bg-[#FFFDF9] shadow-[0_22px_62px_rgba(8,37,77,.10)]">
+        <div className="border-b border-[#ECE4D8] bg-[linear-gradient(135deg,#FFF9EB_0%,#FFFDF9_58%,#F5F8FC_100%)] p-4 sm:p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-extrabold uppercase tracking-[.13em] text-[#9A6A1B]">Your digital copy</p>
+              <div className="mt-1.5 flex items-end gap-2"><span className="text-3xl font-black tracking-[-.045em] text-[#08254D]">₹{price}</span><span className="pb-1 text-[11px] font-semibold text-[#8995A4]">one-time</span></div>
+            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CFE9DC] bg-[#ECF8F2] px-2.5 py-1.5 text-[10px] font-extrabold text-[#147454]"><ShieldCheck size={13} /> Verified checkout</span>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ECF8F2] px-2.5 py-1.5 text-[10px] font-bold text-[#147454]"><ShieldCheck size={13} /> Secure payment</span>
         </div>
 
-        <button onClick={buy} disabled={loading} className="mt-3 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#F59E0B] px-5 py-4 text-[15px] font-bold text-[#0B2D5B] shadow-[0_10px_26px_rgba(245,158,11,.22)] transition hover:-translate-y-0.5 hover:bg-[#FDBA4A] disabled:cursor-not-allowed disabled:opacity-60 sm:text-base">
-          {loading ? <Loader2 className="animate-spin" size={19} /> : <ShoppingBag size={19} />} {loading ? "Processing..." : `Buy now · ₹${price}`}
-        </button>
+        <div className="p-4 sm:p-5">
+          <button onClick={buy} disabled={loading} className="group inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#F7B733] px-5 py-4 text-[15px] font-extrabold text-[#08254D] shadow-[0_13px_30px_rgba(247,183,51,.26)] transition hover:-translate-y-0.5 hover:bg-[#FFC44F] hover:shadow-[0_16px_34px_rgba(247,183,51,.32)] disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60 sm:text-base">
+            {loading ? <Loader2 className="animate-spin" size={19} /> : <ShoppingBag size={19} />} {loading ? "Processing securely..." : `Buy ebook for ₹${price}`}
+          </button>
 
-        <div className="mt-3 grid gap-1.5 text-[11px] font-medium text-[#708095] min-[430px]:grid-cols-2 sm:text-xs">
-          <span className="flex items-center gap-1.5"><LockKeyhole size={13} className="shrink-0 text-[#16815A]" /> Encrypted checkout</span>
-          <span className="flex items-center gap-1.5"><CheckCircle2 size={13} className="shrink-0 text-[#16815A]" /> Automatic secure download</span>
+          <div className="mt-4 grid gap-2.5 text-[11px] font-semibold text-[#66768A] min-[430px]:grid-cols-2 sm:text-xs">
+            <span className="flex items-center gap-2"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[#EEF7F3] text-[#16815A]"><LockKeyhole size={13} /></span> Encrypted payment</span>
+            <span className="flex items-center gap-2"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[#FFF4DD] text-[#B36D00]"><Download size={13} /></span> Private PDF delivery</span>
+            <span className="flex items-center gap-2"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[#EEF3FA] text-[#08254D]"><CheckCircle2 size={13} /></span> Server verification</span>
+            <span className="flex items-center gap-2"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[#EEF3FA] text-[#08254D]"><ShieldCheck size={13} /></span> Recovery supported</span>
+          </div>
+          <p className="mt-4 border-t border-[#EEE7DC] pt-3 text-[10px] leading-4 text-[#8B96A3]">Your ebook is released only after successful server-side payment verification.</p>
         </div>
-        <p className="mt-2.5 text-[10px] leading-4 text-[#8A98A9]">The ebook is released only after server-side payment verification.</p>
       </div>
 
-      <div className="fixed inset-x-0 bottom-[64px] z-[55] border-t border-[#E2E8F0] bg-white/96 px-3 py-2.5 shadow-[0_-10px_28px_rgba(11,45,91,.10)] backdrop-blur-xl md:hidden">
+      <div className="fixed inset-x-0 bottom-[64px] z-[55] border-t border-[#E4DDD2] bg-[#FFFDF9]/96 px-3 py-2.5 shadow-[0_-12px_34px_rgba(8,37,77,.10)] backdrop-blur-xl md:hidden">
         <div className="mx-auto flex max-w-md items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="truncate text-[10px] font-semibold text-[#748396]">{title}</p>
-            <div className="mt-0.5 flex items-center gap-1.5"><span className="text-lg font-bold text-[#0B2D5B]">₹{price}</span><span className="text-[10px] font-semibold text-[#16815A]">Secure delivery</span></div>
+            <div className="mt-0.5 flex items-center gap-1.5"><span className="text-xl font-black tracking-[-.035em] text-[#08254D]">₹{price}</span><span className="text-[10px] font-bold text-[#16815A]">Secure delivery</span></div>
           </div>
-          <button onClick={buy} disabled={loading} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#F59E0B] px-4 text-sm font-bold text-[#0B2D5B] shadow-[0_7px_18px_rgba(245,158,11,.20)] disabled:opacity-60">
-            {loading ? <Loader2 className="animate-spin" size={17} /> : <ShoppingBag size={17} />} Buy now
+          <button onClick={buy} disabled={loading} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#F7B733] px-4 text-sm font-extrabold text-[#08254D] shadow-[0_8px_20px_rgba(247,183,51,.26)] disabled:opacity-60">
+            {loading ? <Loader2 className="animate-spin" size={17} /> : <ShoppingBag size={17} />} {loading ? "Please wait" : "Buy now"}
           </button>
         </div>
       </div>
